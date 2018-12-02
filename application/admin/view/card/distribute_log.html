@@ -1,0 +1,179 @@
+{include file="public/header" /}
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>卡分配记录</h5>
+        </div>
+        <div class="ibox-content">        
+            <div class="row">
+                <div class="col-sm-12">   
+                    <form name="admin_list_sea" class="form-search" method="post" action="{:url('distribute_log')}" id="myForm">
+                        <!--<div class="col-md-2">-->
+                            <!--<input type="text" id="key" name="key" value="{}" class="form-control" placeholder="输入查询卡号">-->
+                        <!--</div>-->
+                        <div class="col-md-6">
+                            <input class="form-control layer-date" placeholder="开始时间" id="starttime" name="starttime" value="{$starttime}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+                            <input class="form-control layer-date" placeholder="结束时间" id="endtime" name="endtime" value="{$endtime}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+                        </div>
+                        {if $groupid == 1}
+                        <div class="col-md-3">
+                            <label class="col-sm-5 control-label"><i class="text-danger">* </i>代理商：</label>
+                            <div class="input-group col-sm-7">
+                                <select class="form-control m-b chosen-select" id="agent_id" name="agent_id">
+                                    <option value="0">==请选择==</option>
+                                    {if !empty($agent_list)}
+                                    {foreach name="agent_list" item="vo"}
+                                    <option value="{$vo.id}" {if $agent_id == $vo.id} selected{/if} >{$vo.real_name}</option>
+                                    {/foreach}
+                                    {/if}
+                                </select>
+                            </div>
+                        </div>
+                        {/if}
+                        <div class="col-md-6" style="float: right;margin-bottom: 10px;margin-top: 10px;margin-right: 40px;">
+                            <button class="pull-right btn btn-success" type="button" id="dataExport"><i class="fa fa-download"></i> 导出</button>
+                            <button class="pull-right btn btn-primary" type="submit" style="margin-right: 5px;"><i class="fa fa-save"></i> 搜索</button>
+                        </div>
+                        
+                    </form>                         
+                </div>
+            </div>
+            <div class="example-wrap">
+                <div class="example">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="long-tr">
+                                <th>序号</th>
+                                <th>代理商</th>
+                                <th>分配卡数量</th>
+                                <th>分配时间</th>
+                                <th>操作人</th>
+                            </tr>
+                        </thead>
+                        <script id="arlist" type="text/html">
+                            {{# for(var i=0;i<d.length;i++){  }}
+                            <tr class="long-td">
+                                <td>{{i+1}}</td>
+                                <td>{{d[i].agent_name}}</td>
+                                <td>{{d[i].card_num}}</td>
+                                <td>{{d[i].distribute_time}} </td>
+                                <td>{{d[i].operator_name}} </td>
+                            </tr>
+                            {{# } }}
+                        </script>
+                        <tbody id="article_list"></tbody>
+                    </table>
+                    <div id="AjaxPage" style=" text-align: right;"></div>
+                    <div id="allpage" style=" text-align: right;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+</div>
+<input type="hidden" id="Nowpage" value="{$Nowpage}">
+<!-- 加载动画 -->
+<div class="spiner-example">
+    <div class="sk-spinner sk-spinner-three-bounce">
+        <div class="sk-bounce1"></div>
+        <div class="sk-bounce2"></div>
+        <div class="sk-bounce3"></div>
+    </div>
+</div>
+
+{include file="public/footer" /}
+
+<script type="text/javascript">
+    $(function () {
+//        $("#dataExport").on("click",function(){
+//            dataExport();
+//        })
+//
+//        function dataExport(){
+//            var data=$("#myForm").serialize();
+//            $.getJSON("{:url('export_data')}", data, function(res){
+//                if(res.code == 1){
+//                    var urlxls=res.data;
+//                    window.location.href= urlxls;
+//
+//                }else{
+//                    layer.msg(res.msg,{icon:0,time:1500,shade: 0.1});
+//                }
+//            });
+//        }
+        $("#dataExport").on("click",function(){
+            layer.load();
+            dataExport();
+        })
+
+        function dataExport(){
+            var data=$("#myForm").serialize();
+            var url = "{:url('export_distribute_log')}" + '?' + data;
+            window.location.href = "__HTTP__" + url;
+            layer.closeAll();
+        }
+    })
+    /**
+     * [Ajaxpage laypage分页]
+     * @param {[type]} curr [当前页]
+     * @Author''
+     */ 
+    function Ajaxpage(curr){
+        if(curr){
+            $('#Nowpage').val(curr);
+        }
+        var starttime=$('#starttime').val();
+        var endtime=$('#endtime').val();
+        var status=$('#status').val();
+        var pay_type=$('#pay_type').val();
+        var key=$('#key').val();
+        var agent_id=$('#agent_id').val();
+        $.getJSON('{:url("distribute_log")}', {
+            page: curr || 1,starttime:starttime,endtime:endtime,status:status,key:key,agent_id:agent_id,pay_type:pay_type
+        }, function(data){      //data是后台返回过来的JSON数据
+
+            $(".spiner-example").css('display','none'); //数据加载完关闭动画           
+            if(data==''){
+                $("#article_list").html('<td colspan="20" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
+            }else{
+                article_list(data); //模板赋值
+                laypage({
+                    cont: $('#AjaxPage'),//容器。值支持id名、原生dom对象，jquery对象,
+                    pages:'{$allpage}',//总页数
+                    skip: true,//是否开启跳页
+                    skin: '#1AB5B7',//分页组件颜色
+                    curr: curr || 1,
+                    groups: 3,//连续显示分页数
+                    jump: function(obj, first){
+
+                        if(!first){
+                            Ajaxpage(obj.curr)
+                        }
+                        $('#allpage').html('第'+ obj.curr +'页，共'+ obj.pages +'页');
+                    }
+                });
+            }
+        });
+    }
+
+    Ajaxpage();
+
+    /**
+     * [article_list 接收异步获取的数据渲染到模板]
+     * @Author''
+     */
+    function article_list(list){
+
+        var tpl = document.getElementById('arlist').innerHTML;
+        laytpl(tpl).render(list, function(html){
+            document.getElementById('article_list').innerHTML = html;
+        });
+    }
+
+
+
+</script>
+</body>
+</html>

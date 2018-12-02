@@ -1,0 +1,279 @@
+{include file="public/header" /}
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>退单列表</h5>
+        </div>
+        <div class="ibox-content">        
+            <div class="row">
+                <div class="col-sm-12">   
+                    <form name="admin_list_sea" class="form-search" method="post" action="{:url('order_verify')}" id="myForm">
+                        <div class="col-md-4">
+                            <input class="form-control layer-date" placeholder="开始时间" id="starttime" name="starttime" value="{$starttime}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+                            <input class="form-control layer-date" placeholder="结束时间" id="endtime" name="endtime" value="{$endtime}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="col-sm-5" style="line-height: 30px;">订单状态：</label>
+                            <div class="col-sm-6">
+                                <select class="form-control" id="status" name="status">
+                                    <option value="1" {if condition="$status eq 1"}selected{/if}>客户已申请</option>
+                                    <option value="2" {if condition="$status eq 2"}selected{/if}>运营已拒绝</option>
+                                    <option value="3" {if condition="$status eq 3"}selected{/if}>运营已审核</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="col-sm-5" style="line-height: 30px;">支付方式：</label>
+                            <div class="col-sm-6">
+                                <select class="form-control" id="pay_type" name="pay_type">
+                                    <option value="0" {if condition="$pay_type eq 4"}selected{/if}>全部</option>
+                                    <option value="4" {if condition="$pay_type eq 4"}selected{/if}>购物豆支付</option>
+                                    <option value="2" {if condition="$pay_type eq 2"}selected{/if}>微信支付</option>
+                                    <option value="1" {if condition="$pay_type eq 1"}selected{/if}>余额支付</option>
+                                    <option value="-1" {if condition="$pay_type eq -1"}selected{/if}>混合支付</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" id="key" name="key" value="{$key}" class="form-control" placeholder="输入查询手机号码">
+                        </div>
+                        <div class="col-md-6" style="float: right;margin-bottom: 10px;margin-top: 10px;margin-right: 40px;">
+                            <button class="pull-right btn btn-success" type="button" id="dataExport"><i class="fa fa-download"></i> 导出</button>
+                            <button class="pull-right btn btn-primary" type="submit" style="margin-right: 5px;"><i class="fa fa-save"></i> 搜索</button>
+                        </div>
+                        
+                    </form>                         
+                </div>
+            </div>
+            <div class="example-wrap">
+                <div class="example">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="long-tr">
+                                <th>订单号</th>
+                                <th>微信交易单号</th>
+                                <th>支付金额</th>
+                                <th>手机号码</th>
+                                <th>支付方式</th>
+                                <th>退款理由</th>
+                                <th>操作时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <script id="arlist" type="text/html">
+                            {{# for(var i=0;i<d.length;i++){  }}
+                            <tr class="long-td">
+                                <td>
+                                    {{d[i].mo_number}}
+                                    <input type="hidden" re_id="{{d[i].id}}" id="reverse_{{i}}">
+                                </td>
+                                <td>
+                                    {{# if(d[i].pay_number){ }}
+                                    {{d[i].pay_number}}
+                                    {{# }else{ }}
+                                    无
+                                    {{# } }}
+                                </td>
+                                <td>{{d[i].reversal_money}} </td>
+                                <td>{{d[i].mobile}} </td>
+                                <td>{{d[i].pay_name}} </td>
+                                <td>{{d[i].reason_desc}}</td>
+                                <td>
+                                    {{# if(d[i].refund_time){ }}
+                                    {{d[i].refund_time}}
+                                    {{# }else{ }}
+                                    {{d[i].created_ts}}
+                                    {{# } }} 
+                                 </td>
+                                <td>
+                                    {{# if(d[i].status ==1){ }}
+                                    <a href="javascript:;" onclick="update_order({{i}})" class="btn btn-danger btn-outline btn-xs">
+                                           审核</a>
+                                    {{# }else if(d[i].status ==2){ }}
+                                    审核失败
+                                    {{# }else if(d[i].status ==3){ }}
+                                    审核已通过
+                                    {{# } }}
+                                </td>
+                            </tr>
+                            {{# } }}
+                        </script>
+                        <tbody id="article_list"></tbody>
+                    </table>
+                    <div id="AjaxPage" style=" text-align: right;"></div>
+                    <div id="allpage" style=" text-align: right;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+</div>
+<input type="hidden" id="Nowpage" value="{$Nowpage}">
+<!-- 加载动画 -->
+<div class="spiner-example">
+    <div class="sk-spinner sk-spinner-three-bounce">
+        <div class="sk-bounce1"></div>
+        <div class="sk-bounce2"></div>
+        <div class="sk-bounce3"></div>
+    </div>
+</div>
+
+{include file="public/footer" /}
+
+<script type="text/javascript">
+    $(function () {
+        $("#dataExport").on("click",function(){
+            dataExport();
+        })
+
+        function dataExport(){
+            var data=$("#myForm").serialize();
+            $.getJSON("{:url('export_update_order')}", data, function(res){
+                if(res.code == 1){
+                    var urlxls=res.data;
+                    window.location.href= urlxls;
+
+                }else{
+                    layer.msg(res.msg,{icon:0,time:1500,shade: 0.1});
+                }
+            });
+        }
+    })
+    /**
+     * [Ajaxpage laypage分页]
+     * @param {[type]} curr [当前页]
+     * @Author''
+     */ 
+    function Ajaxpage(curr){
+        if(curr){
+            $('#Nowpage').val(curr);
+        }
+        var starttime=$('#starttime').val();
+        var endtime=$('#endtime').val();
+        var status=$('#status').val();
+        var pay_type=$('#pay_type').val();
+        var key=$('#key').val();
+        $.getJSON('{:url("order_verify")}', {
+            page: curr || 1,starttime:starttime,endtime:endtime,status:status,key:key,pay_type:pay_type
+        }, function(data){      //data是后台返回过来的JSON数据
+
+            $(".spiner-example").css('display','none'); //数据加载完关闭动画           
+            if(data==''){
+                $("#article_list").html('<td colspan="20" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
+            }else{
+                article_list(data); //模板赋值
+                laypage({
+                    cont: $('#AjaxPage'),//容器。值支持id名、原生dom对象，jquery对象,
+                    pages:'{$allpage}',//总页数
+                    skip: true,//是否开启跳页
+                    skin: '#1AB5B7',//分页组件颜色
+                    curr: curr || 1,
+                    groups: 3,//连续显示分页数
+                    jump: function(obj, first){
+
+                        if(!first){
+                            Ajaxpage(obj.curr)
+                        }
+                        $('#allpage').html('第'+ obj.curr +'页，共'+ obj.pages +'页');
+                    }
+                });
+            }
+        });
+    }
+
+    Ajaxpage();
+
+    /**
+     * [article_list 接收异步获取的数据渲染到模板]
+     * @Author''
+     */
+    function article_list(list){
+
+        var tpl = document.getElementById('arlist').innerHTML;
+        laytpl(tpl).render(list, function(html){
+            document.getElementById('article_list').innerHTML = html;
+        });
+    }
+
+    //申请退单
+    function update_order(i){
+        var id = $('#reverse_'+ i).attr('re_id');
+        layer.open({  
+            id:1,  
+            type: 1,  
+            title:'审核退单',  
+            skin:'layui-layer-rim',  
+            area:['450px', 'auto'],  
+            btn:['审核通过','审核不通过'],  
+            btn1: function (index,layero) { 
+                $.getJSON("{:url('reverse_order_status')}",{id:id,status:3},function(res){
+                    if(res.code === '00000'){
+                        layer.msg('已提交退单申请', {icon: 6,time:1500,shade: 0.1}, function(index){
+                            $('.form-submit').attr('disabled',false);
+                        });
+                        layer.close(index);  
+                        Ajaxpage($("#Nowpage").val());
+                    }else{
+                        layer.msg(res.message, {icon: 5,time:1500,shade: 0.1});
+                        $('.form-submit').attr('disabled',false);
+                        return false; 
+                    }
+                });
+            },  
+            btn2:function (index,layero) {  
+                $.getJSON("{:url('reverse_order_status')}",{id:id,status:2},function(res){
+                    if(res.code === '00000'){
+                        layer.msg('已拒绝退单申请', {icon: 6,time:1500,shade: 0.1}, function(index){
+                            $('.form-submit').attr('disabled',false);
+                        });
+                        layer.close(index);  
+                        Ajaxpage($("#Nowpage").val());
+                    }else{
+                        layer.msg(res.message, {icon: 5,time:1500,shade: 0.1});
+                        $('.form-submit').attr('disabled',false);
+                        return false; 
+                    }
+                });
+            }  
+      
+        }); 
+    }
+
+
+    //申请退款
+    function update_order_money(i){
+        var id = $('#reverse_'+i).attr('re_id');
+        layer.open({  
+            id:1,  
+            type: 1,  
+            title:'审核退款',  
+            skin:'layui-layer-rim',  
+            area:['450px', 'auto'],  
+            btn:['已退款','取消'],  
+            btn1: function (index,layero) {
+                $.getJSON("{:url('reverse_order_status')}",{id:id,status:9},function(res){
+                    if(res.code === '00000'){
+                        layer.msg('已退款', {icon: 6,time:1500,shade: 0.1}, function(index){
+                            $('.form-submit').attr('disabled',false);
+                        });
+                        layer.close(index);  
+                        Ajaxpage($("#Nowpage").val());
+                    }else{
+                        layer.msg(res.message, {icon: 5,time:1500,shade: 0.1});
+                        $('.form-submit').attr('disabled',false);
+                        return false; 
+                    }
+                });
+            },  
+            btn2:function (index,layero) {  
+                 layer.close(index);  
+            }  
+      
+        }); 
+    }
+
+</script>
+</body>
+</html>

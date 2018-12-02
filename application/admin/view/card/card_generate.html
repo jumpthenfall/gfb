@@ -1,0 +1,277 @@
+{include file="public/header" /}
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>卡生成记录列表</h5>
+        </div>
+        <div class="ibox-content">          
+            <div class="row">
+                <div class="col-sm-12">   
+                    <div  class="col-sm-2">
+                        <div class="input-group" >  
+                            <button type="button" class="btn btn-primary btn-outline" data-toggle="modal" data-target="#myModal">生成卡</button> 
+                        </div>
+                    </div>                                                                                        
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="example-wrap">
+                <div class="example">
+                    <form id="ruleorder" name="ruleorder" method="post" action="{:url('card_generate')}" >
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr class="long-tr">
+                                    <th width="5%">ID</th>
+                                    <th width="8%">起始号段</th>
+                                    <th width="5%">生成数量</th>
+									<th width="15%">每天获取佣金峰值</th>
+                                    <th width="8%">分配给的代理商</th>
+                                    <th width="15%">生成时间</th>
+									<th width="15%">卡有效期</th>
+                                    <th width="10%">生成状态</th>
+									<th width="15%">是否导出</th>
+                                </tr>
+                            </thead>
+                            <tbody>                       
+                                {foreach name="card_res" item="v"}
+                                    <tr class="long-td">
+                                        <td>{$v.id}</td>
+                                        <td>{$v.cardDescribe}</td>
+                                        <td>{$v.cardNums}</td>
+										<td>{$v.peak_value}</td>
+										<td>
+										    {if !empty($agent_list)}
+												{foreach name="agent_list" item="vo"}
+												   {if $v.agent_id == $vo.id}{$vo.real_name}{/if}
+												{/foreach}
+											{/if}
+										</td>
+                                        <td>{$v.addTime}</td>
+                                        <td>{$v.time_length}个月</td>
+                                        <td>
+                                            {if condition="$v.status eq 1"}
+											<span class="label label-info">生成成功</span>
+											{else/}
+											<span class="label label-danger">生成失败</span>
+											{/if}                                    
+                                        </td>
+										<td>
+											{neq name="v.recordMark" value=""}
+											
+											
+											<a href="{:url('export_card_record',['marke'=>$v.recordMark])}" class="btn btn-primary btn-outline btn-xs">
+                                                <i class="fa fa-download"></i> 导出卡信息</a>&nbsp;&nbsp;
+											{/neq}
+											<!--{eq name="v.recordMark" value="0"}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{/eq}-->
+											
+										</td>
+                                    </tr>
+                                {/foreach}
+                                <tr>
+                                    <td colspan="10" align="right">
+                                    <!-- <button type="submit"  id="btnorder" class="btn btn-info">更新排序</button></td> -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+{include file="public/footer" /}
+    <div class="modal  fade" id="myModal" tabindex="-1" role="dialog"  aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h3 class="modal-title">新生成卡</h3>                  
+                </div>
+                <form class="form-horizontal" name="add_card" id="add_card" method="post" action="{:url('add_card')}">
+                    <div class="ibox-content">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">分配代理商</label>
+                                <div class="col-sm-8">                                                      
+                                    <select name="agent_id" id="agent_id" class="form-control">id
+                                        <option value="">--请选择--</option>
+										<!--<option value="0">暂不分配代理商</option>-->
+                                        {if !empty($agent_list)}
+											{foreach name="agent_list" item="vo"}
+											<option value="{$vo.id}">{$vo.real_name}</option>
+											{/foreach}
+										{/if}
+                                    </select>                                    
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">卡号起始号段</label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="cardDescribe" id="cardDescribe" placeholder="输入卡号起始号段" class="form-control"/>
+									<span class="help-block m-b-none">如：100000,500000等 (必须是正整数)</span>
+                                </div>
+                            </div>                      
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">生成数量</label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="cardNums" id="cardNums" placeholder="输入生成卡号数量" class="form-control"/>
+                                    <span class="help-block m-b-none">如：100,500，5000等 (必须是正整数)</span>
+                                </div>
+                            </div>  
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">卡有效时长</label>
+                                <div class="col-sm-8">
+                                    <select name="time_length" id="time_length" class="form-control">id
+                                        <option value="1">1个月</option>
+                                        <option value="2">2个月</option>
+                                        <option value="3" selected="selected">3个月</option>
+                                        <option value="4">4个月</option>
+                                        <option value="5">5个月 </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!--<div class="hr-line-dashed"></div>-->
+                            <!--<div class="form-group">-->
+                                <!--<label class="col-sm-3 control-label">有效起始时间</label>-->
+                                <!--<div class="col-sm-8">-->
+                                    <!--<input class="form-control layer-date" placeholder="有效起止时间" id="startTime" name="startTime" value="" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">-->
+                                    <!---->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<div class="hr-line-dashed"></div>-->
+                            <!--<div class="form-group">-->
+                                <!--<label class="col-sm-3 control-label">有效结束时间</label>-->
+                                <!--<div class="col-sm-8">-->
+                                    <!--<input class="form-control layer-date" placeholder="有效结束时间" id="endTime" name="endTime" value="" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">-->
+                                <!--</div>-->
+                            <!--</div>-->
+							<div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">每天收益峰值</label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="peak_value" id="peak_value" placeholder="输入生成卡每天收益峰值" value="38" class="form-control"/>
+									<span class="help-block m-b-none">如：35,38，50等 (必须是正整数，单元：元)</span>
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                            <label class="col-sm-3 control-label">状&nbsp;态</label>
+                            <div class="col-sm-6">
+                                <div class="radio i-checks">
+                                    <input type="radio" name='status' value="1" checked="checked"/>开启&nbsp;&nbsp;
+                                    <input type="radio" name='status' value="0" />关闭
+                                </div>
+                            </div>
+                        </div>                  
+                        </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> 确认生成</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> 取&nbsp;&nbsp;消</button>                    
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+   
+    $(function(){
+        $('#add_card').ajaxForm({
+            beforeSubmit: checkForm, 
+            success: complete, 
+            dataType: 'json'
+        });
+        
+        function checkForm(){
+            if( '' == $.trim($('#agent_id').val())){
+                layer.msg('请选择代理商',{icon:2,time:1500,shade: 0.1}, function(index){
+                layer.close(index);
+                });
+                return false;
+            }
+            if( '' == $.trim($('#cardDescribe').val())){
+                layer.msg('请输入卡号起始号段',{icon:2,time:1500,shade: 0.1}, function(index){
+                layer.close(index);
+                });
+                return false;
+            }
+
+			if( '' == $.trim($('#cardNums').val())){
+                layer.msg('请输入生成卡数量',{icon:2,time:1500,shade: 0.1}, function(index){
+                layer.close(index);
+                });
+                return false;
+            }
+            
+//            if( '' == $.trim($('#startTime').val())){
+//                layer.msg('卡有效起始时间不能为空',{icon:0,time:1500,shade: 0.1}, function(index){
+//                layer.close(index);
+//                });
+//                return false;
+//            }
+            if( '' == $.trim($('#time_length').val())){
+                layer.msg('请选择有效时长',{icon:0,time:1500,shade: 0.1}, function(index){
+                layer.close(index);
+                });
+                return false;
+            }
+        }
+
+
+        function complete(data){
+            if(data.code==1){
+                layer.msg(data.msg, {icon: 6,time:1500,shade: 0.1}, function(index){
+                    window.location.href="{:url('card/card_generate')}";
+                });
+            }else{
+                layer.msg(data.msg, {icon:5,time:1500,shade: 0.1});
+                return false;   
+            }
+        }
+     
+    });
+
+
+    //更新排序
+    $(function(){
+        $('#ruleorder').ajaxForm({
+            success: complete, 
+            dataType: 'json'
+        });
+
+        function complete(data){
+            if(data.code==1){
+                layer.msg(data.msg, {icon: 1,time:1500,shade: 0.1}, function(index){
+                    window.location.href="{:url('card/card_generate')}";
+                });
+            }else{
+                layer.msg(data.msg, {icon: 1,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                    window.location.href=data.url;
+                });
+            }
+        }
+    });
+
+
+
+
+    //IOS开关样式配置
+   var elem = document.querySelector('.js-switch');
+        var switchery = new Switchery(elem, {
+            color: '#1AB394'
+        });
+    var config = {
+        '.chosen-select': {},                    
+    }
+    for (var selector in config) {
+        $(selector).chosen(config[selector]);
+    }
+</script>
+</body>
+</html>

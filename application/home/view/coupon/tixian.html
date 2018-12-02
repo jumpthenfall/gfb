@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<title>申请提现</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="/static/assets/css/mui.min.css" />
+		<link rel="stylesheet" type="text/css" href="/static/assets/css/style.css" />
+	</head>
+
+	<body>
+
+		<div class="mui-content">
+			<div class="tixian-header">
+				<div class="mui-row">
+					<div class="mui-col-xs-4">
+						<div class="tixian-icon icon-money"></div>
+						<h3 class="tixian-title cur-money">{$total}</h3>
+						<p class="tixian-sub-desc">（可提现金额）</p>
+					</div>
+					<div class="mui-col-xs-4">
+						<div class="money-name">金额</div>
+					</div>
+					<div class="mui-col-xs-4">
+						<div class="tixian-icon icon-bank"></div>
+						<h3 class="tixian-title cur-bank">银行卡</h3>
+						<p class="tixian-sub-desc">（提现到银行卡）</p>
+					</div>
+				</div>
+			</div>
+			<div class="tixian-body">
+				<form id="myform" class="mui-input-group">
+					<div class="mui-input-row">
+						<label>提现金额</label>
+						<input type="text" name="we_price" id="money" class="mui-input-clear" placeholder="输入提现金额">
+					</div>
+					<div class="mui-input-row">
+						<label>开户行</label>
+						<select id="bankName" name="we_bank" class="select-bank">
+							<option>选取开户行</option>
+							<option value="中国银行">中国银行</option>
+							<option value="中国工商银行">中国工商银行</option>
+							<option value="中国建设银行">中国建设银行</option>
+							<option value="中国农业银行">中国农业银行</option>
+							<option value="招商银行">招商银行</option>
+						</select>
+					</div>
+					<div class="mui-input-row">
+						<label>开户支行</label>
+						<input type="text" name="we_bank_branch" id="bankBranch" class="mui-input-clear" placeholder="输入开户支行" value="">
+					</div>
+					<div class="mui-input-row">
+						<label>户名</label>
+						<input type="text" name="we_bank_name" id="cardName" class="mui-input-clear" placeholder="输入户名" value="">
+					</div>
+					<div class="mui-input-row">
+						<label>卡号</label>
+						<input type="text" name="we_bank_number" id="cardCode" class="mui-input-clear" placeholder="输入卡号" value="" pattern="[0-9]*">
+					</div>
+					<input type="hidden" name="shop_id" id="shop_id" value="{$id}">
+				</form>
+				<div class="button-default">
+					<button type="button" class="mui-btn mui-btn-default mui-btn-block btn-tixian">立即提现</button>
+				</div>
+
+			</div>
+			<div class="tixian-footer">
+				<h4 class="tips">温馨提示</h4>
+				<p>1.每笔提现金额最低30起。</p>
+				<p>2.提现后1-3个工作日到账。</p>
+				<p>3.每天提现结算时间段工作日上午10:00-下午16:00</p>
+			</div>
+		</div>
+		<script type="text/javascript">
+			login = "";
+		</script>
+		<script src="/static/assets/js/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/assets/js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/assets/js/base.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			var Tixian = {
+				shopId: $('#shop_id').val(),
+				totalrevenue: "<?php echo $total; ?>",
+				init: function() {
+					Tixian.showWalletMoney();
+					$('.tixian-body').on('tap', '.btn-tixian', function() {
+						var _checkform = Tixian.checkForm();
+						_checkform && Tixian.applyTixian();
+						return false;
+					});
+				},
+				showWalletMoney: function() {
+//					$('.cur-money').text(Tixian.totalrevenue);
+				},
+				checkForm: function() {
+					var flag = !0;
+					var rules = {
+						money: {
+							title: '提现金额',
+							reg: /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/,
+							msg: '输入有效的金额'
+						},
+						bankName: {
+							title: '开户行',
+							meg: '输入开户行'
+						},
+						bankBranch: {
+							title: '开户支行',
+							meg: '选择开户支行'
+						},
+						cardName: {
+							title: '户名',
+							meg: '输入户名'
+						},
+						cardCode: {
+							title: '卡号',
+							meg: '输入卡号'
+						}
+					};
+					$.each(rules, function(k, v) {
+						var val = $('#' + k).val(),
+							limitminval = 30,
+							limitmaxval = parseFloat($('.cur-money').text()).toFixed(2),
+
+							limitwechat = 20000;
+						if(val == '') {
+							mui.alert('请输入' + v.title + '!');
+							flag = !1;
+							return false;
+						} else {
+							if(k == 'money') {
+								var mval = parseFloat(val).toFixed(2);
+								if(v.reg && !v.reg.test(mval)) {
+									mui.alert(v.msg, '提示');
+									flag = !1;
+									return false;
+								} else if(mval - limitminval<0 ) {
+									mui.alert('您的提现金额不足30！', '提示');
+									flag = !1;
+									return false;
+								}  else if(mval - limitmaxval>0 ) {
+									mui.alert('您输入的金额超出最大余额！', '提示');
+									flag = !1;
+									return false;
+								} else if(mval - limitwechat> 0) {
+									mui.alert('您输入的金额超出微信最大提现金额！', '提示');
+									flag = !1;
+									return false;
+								}
+							}
+						}
+					});
+					return flag;
+				},
+
+				applyTixian: function() {
+					var data = $('#myform').serialize();
+					var money = $('#money').val()
+					$.ajax({
+						type:"post",
+						url: "/home/coupon/tixian.html",
+						data:data,
+						success:function(res) {
+                            if (res.code == 200) {
+                                mui.toast('申请成功！');
+                                location.href = "/home/coupon/submitSuccess.html?money=" + res.data;
+                            } else if (res.code == 4008) {
+                                mui.alert(res.msg, '提示');
+                                location.href = "/home/coupon/login.html";
+                            } else {
+                                mui.alert(res.msg, '提示');
+                            }
+                        },
+						error:function () {
+                            mui.alert('网络错误', '提示');
+                        }
+					});
+				},
+			};
+
+			$(function() {
+				Tixian.init();
+			});
+		</script>
+	</body>
+
+</html>

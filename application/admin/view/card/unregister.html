@@ -1,0 +1,298 @@
+{include file="public/header" /}
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>卡密管理</h5>
+        </div>
+        <div class="ibox-content">        
+            <div class="row">
+                <div class="col-sm-12">   
+                    <form name="admin_list_sea" class="form-search" method="post" action="{:url('unregister')}" id="myForm">
+
+						<!--<div class="col-md-4">-->
+                            <!--<input type="text" class="form-control" placeholder="起始分配卡号" id="card_number" name="card_number" value="" >-->
+                        <!--</div>-->
+						 <!--<div class="col-md-3">-->
+                            <!--<input type="text" id="key" name="key" value="" class="form-control" placeholder="输入分配数量">-->
+                        <!--</div>-->
+                        <div class="col-md-12" style="float: right;margin-bottom: 10px;margin-top: 10px;margin-right: 10px;">
+                            <button class="pull-left btn btn-success" type="button" id="add_agent_batch"><i class="fa fa-bind"></i> 批量绑定</button>
+                            <button class="pull-right btn btn-success" type="button" id="dataExport"><i class="fa fa-download"></i> 导出</button>
+							<!--<button class="pull-right btn btn-success" type="button" id="fenpei" style="padding:6px 12px;background-color:red;border-color:red;margin-right:5px;"><i class="fa fa-truck"></i> 批量分配</button>-->
+                            <button class="pull-right btn btn-primary" type="submit" style="margin-right: 5px;"><i class="fa fa-save"></i> 搜索</button>
+                        </div>
+                        
+                    </form>                         
+                </div>
+            </div>
+            <div class="example-wrap">
+                <div class="example">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="long-tr">
+                                <th><input type="checkbox" id="seleted_total"></th>
+                                <th>序号</th>
+                                <th>卡号</th>
+                                <th>卡密</th>
+                                <th>添加时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <script id="arlist" type="text/html">
+                            {{# for(var i=0;i<d.length;i++){  }}
+                            <tr class="long-td">
+                                <td><input type="checkbox" id="origin_card_{{d[i].id}}" value="{{d[i].id}}"></td>
+                                <td>{{i+1}}</td>
+                                <td>{{d[i].card_number}}</td>
+                                <td>{{d[i].password}} </td>
+                                <td>{{d[i].add_time}} </td>
+                                <td>{{d[i].statusRemark}} </td>
+                                <td>
+
+                                    <a href="javascript:;" onclick="add_agent({{d[i].id}},2)" class="btn btn-primary btn-outline btn-xs">
+                                           绑定代理</a>
+
+                                    <a href="javascript:;" onclick="del_card({{d[i].id}})" class="btn btn-danger btn-outline btn-xs">
+                                           删除</a>
+
+                                </td>
+                            </tr>
+                            {{# } }}
+                        </script>
+                        <tbody id="article_list"></tbody>
+                    </table>
+
+                    <div id="AjaxPage" style=" text-align: right;"></div>
+                    <div id="allpage" style=" text-align: right;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+</div>
+<input type="hidden" id="Nowpage" value="{$Nowpage}">
+<!-- 加载动画 -->
+<div class="spiner-example">
+    <div class="sk-spinner sk-spinner-three-bounce">
+        <div class="sk-bounce1"></div>
+        <div class="sk-bounce2"></div>
+        <div class="sk-bounce3"></div>
+    </div>
+</div>
+
+<div id="agent_list_container" style="display: none;" >
+
+	<div class="form-group">
+		<label class="col-sm-4 control-label">代理商：</label>
+		<div class="input-group col-sm-6">
+			<select class="form-control m-b chosen-select" name="agent_id" >
+				<option value="">==请选择代理商==</option>
+				{if !empty($agent_list)}
+					{foreach name="agent_list" item="vo"}
+					<option value="{$vo.id}">{$vo.real_name}</option>
+					{/foreach}
+				{/if}
+			</select>
+		</div>
+	</div>
+	<div class="hr-line-dashed"></div>
+
+	<div class="form-group">
+		<label class="col-sm-4 control-label">每天佣金峰值：</label>
+		<div class="input-group col-sm-6">
+			<select class="form-control m-b chosen-select" name="peak_value" >
+                {if !empty($peak_list)}
+                    {foreach name="peak_list" item="p"}
+                    <option value="{$p}">{$p} 元/日</option>
+                    {/foreach}
+                {/if}
+			</select>
+		</div>
+	</div>
+</div>
+
+{include file="public/footer" /}
+
+<script type="text/javascript">
+    $(function () {
+        $('#seleted_total').click(function () {
+            if($('#seleted_total').is(':checked')){
+                $('table>tbody').find('input[type=checkbox]').prop('checked',true);
+            }else{
+                $('table>tbody').find('input[type=checkbox]').prop('checked',false);
+            }
+        })
+
+        $('#add_agent_batch').click(function () {
+            var ids =[];
+            var list = $('table>tbody').find('input[type=checkbox]:checked');
+          list.map(function (i) {
+              ids[i] = $(this).val();
+          });
+          var id = ids.join(',');
+          if(!id){
+              layer.msg('请选择卡', {icon: 5,time:1500,shade: 0.1});
+              return false;
+          }
+          add_agent(id);
+        })
+
+//        $("#dataExport").on("click",function(){
+//            dataExport();
+//        })
+//
+//        function dataExport(){
+//            var data=$("#myForm").serialize();
+//            $.getJSON("{:url('export_data')}", data, function(res){
+//                if(res.code == 1){
+//                    var urlxls=res.data;
+//                    window.location.href= urlxls;
+//
+//                }else{
+//                    layer.msg(res.msg,{icon:0,time:1500,shade: 0.1});
+//                }
+//            });
+//        }
+        $("#dataExport").on("click",function(){
+            layer.load();
+            dataExport();
+        })
+
+        function dataExport(){
+            var data=$("#myForm").serialize();
+            var url = "{:url('export_unregister')}" + '?' + data;
+            window.location.href = "__HTTP__" + url;
+            layer.closeAll();
+        }
+    })
+    /**
+     * [Ajaxpage laypage分页]
+     * @param {[type]} curr [当前页]
+     * @Author''
+     */ 
+    function Ajaxpage(curr){
+        if(curr){
+            $('#Nowpage').val(curr);
+        }
+        var starttime=$('#starttime').val();
+        var endtime=$('#endtime').val();
+        var status=$('#status').val();
+        var pay_type=$('#pay_type').val();
+        var key=$('#key').val();
+        $.getJSON('{:url("unregister")}', {
+            page: curr || 1,starttime:starttime,endtime:endtime,status:status,key:key,pay_type:pay_type
+        }, function(data){      //data是后台返回过来的JSON数据
+
+            $(".spiner-example").css('display','none'); //数据加载完关闭动画           
+            if(data==''){
+                $("#article_list").html('<td colspan="20" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
+            }else{
+                article_list(data); //模板赋值
+                laypage({
+                    cont: $('#AjaxPage'),//容器。值支持id名、原生dom对象，jquery对象,
+                    pages:'{$allpage}',//总页数
+                    skip: true,//是否开启跳页
+                    skin: '#1AB5B7',//分页组件颜色
+                    curr: curr || 1,
+                    groups: 3,//连续显示分页数
+                    jump: function(obj, first){
+
+                        if(!first){
+                            Ajaxpage(obj.curr)
+                        }
+                        $('#allpage').html('第'+ obj.curr +'页，共'+ obj.pages +'页');
+                    }
+                });
+            }
+        });
+    }
+
+    Ajaxpage();
+
+    /**
+     * [article_list 接收异步获取的数据渲染到模板]
+     * @Author''
+     */
+    function article_list(list){
+
+        var tpl = document.getElementById('arlist').innerHTML;
+        laytpl(tpl).render(list, function(html){
+            document.getElementById('article_list').innerHTML = html;
+        });
+    }
+
+    //删除卡
+    function del_card(id){
+        url = "{:url('del_origin_card')}"
+        layer.confirm('确认删除?', {icon: 3, title:'确认提示'}, function(index){
+            $.getJSON(url, {'id' : id}, function(res){
+                if(res.code == '200'){
+                    layer.msg('操作成功',{icon:1,time:1500,shade: 0.1});
+                     Ajaxpage()
+                }else{
+                    layer.msg(res.msg,{icon:0,time:1500,shade: 0.1});
+                }
+            });
+            layer.close(index);
+        })
+    }
+
+    function add_agent(id){
+        layer.open({
+            type: 1,
+            title:'新卡绑定代理',
+            skin:'layui-layer-rim',
+            area:['450px', '300px'],
+            shade:0.5,
+            content:  '<div style="margin-top:20px;margin-bottom: 50px;" id="agent_list">' +$('#agent_list_container').html() + '</div>'
+            ,
+            btn:['保存','取消'],
+            btn1: function (index,layero) {
+                var agent_id = $("#agent_list").find('select').eq(0).val();
+                var peak_value = $("#agent_list").find('select').eq(1).val();
+                if(!agent_id || !peak_value){
+                    layer.msg('请选择代理商和日收益值',{icon:0,time:2000,shade: 0.1});return false;
+                }
+                $.getJSON("{:url('add_agent')}",{agent_id:agent_id,peak_value:peak_value,id:id},function(res){
+                    if(res.code == '200'){
+                        layer.msg('成功添加代理商', {icon: 6,time:1500,shade: 0.1}, function(index){
+                            $('.form-submit').attr('disabled',false);
+                        });
+                        layer.close(index);
+                        Ajaxpage($("#Nowpage").val());
+                    }else{
+                        layer.msg(res.msg, {icon: 5,time:1500,shade: 0.1});
+                        $('.form-submit').attr('disabled',false);
+                        return false;
+                    }
+                });
+            },
+            btn2:function (index,layero) {
+                layer.close(index);
+            }
+
+        });
+    }
+
+
+
+    function get_agent_list() {
+        $.getJSON("{:url('get_agent_list')}",{},function(res){
+            if(res.code == '200'){
+               console
+                layer.close(index);
+                Ajaxpage($("#Nowpage").val());
+            }else{
+                layer.msg(res.msg, {icon: 5,time:1500,shade: 0.1});
+                $('.form-submit').attr('disabled',false);
+                return false;
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

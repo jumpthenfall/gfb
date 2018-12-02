@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/base.css">
+    <link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/join.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/cropper.min.css">
+    <link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/uploadinfo.css">
+    <script src='http://tp.whjxry.net/static/home/active/js/jquery.min.js'></script>
+    <title>加入活动</title>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<style>
+    body {
+        background-color: #f1f1f1;
+        min-width: 320px;
+        max-width: 640px;
+        margin: auto;
+    }
+</style>
+<body>
+<div class="join-container" id="crop-avatar">
+
+    <form action="" id="formId">
+        <div class="join-content">
+            <div class="join-select">
+                <label for="select">请选择参加的活动:</label>
+                <select name="stores_id" id="select">
+                    {foreach name="storeslist" id="stores"}
+                        <option value="{$stores.id}">{$stores.alias}({$stores.storesname})</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+        <div class="join-content">
+            <div class="join-info">
+                <span class="join-info-text">请填写个人信息:</span>
+
+                <div class="int">
+                    <input type="text" class="required join-input" name="username" id="username" placeholder="我的艺名">
+                </div>
+                <div class="int">
+                    <input type="text" class="required join-input" name="hobby" id="hobby" placeholder="我的爱好(限制12个字以内)">
+                </div>
+                <div class="int">
+                    <div class="join-div">
+                        <div class="join-div-con">
+                            <input type="text" class="required join-input-phone" name="mobile" id="phone" placeholder="输入手机号">
+                        </div>
+                        <button type="button" class="join-code join-send">发送验证码</button>
+                        <button type="button" class="join-code join-nosend" disabled="disabled">59S</button>
+                    </div>
+                </div>
+                <div class="int">
+                    <input type="text" class="required join-input" id="code" placeholder="输入收到的验证码">
+                </div>
+            </div>
+        </div>
+        <div class="join-content">
+            <div class="join-pic">
+                <p>上传照片（上传1-３张，每张大小不要超过500KB）</p>
+                <div class="upload">
+                    <!-- Current avatar -->
+                    <div class="avatar-view" title="Change the avatar">
+                        <img src="http://tp.whjxry.net/static/home/active/images/image2.png" id="chooseImage" alt="Avatar">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="join-deal">
+            <div class="join-deal-content">
+                <div class="piaochecked on_check">
+                    <input name="need_inv" type="checkbox" style="height:20px;width:20px;" id="deal"
+                           class="radioclass input" value="1">
+                </div>
+                <label for="deal"><a href="deal.html">活动协议(请查看协议并选中提交)</a></label>
+            </div>
+
+            <div class="sub">
+                <input type="submit" class="submit" id="submit" value="提交">
+            </div>
+        </div>
+    </form>
+
+     <!--Cropping modal-->
+    <div class="modal fade" id="avatar-modal" aria-hidden="true" aria-labelledby="avatar-modal-label" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+    <form class="avatar-form" action="crop.php" enctype="multipart/form-data" method="post">
+    <div class="modal-header" style="padding: 10px 15px;">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h4 class="modal-title" id="avatar-modal-label">上传图片</h4>
+    </div>
+    <div class="modal-body">
+    <div class="avatar-body">
+
+    <!-- Upload image and data -->
+    <div class="avatar-upload">
+    <input type="hidden" class="avatar-src" name="avatar_src">
+    <input type="hidden" class="avatar-data" name="avatar_data">
+    <!--<label for="avatarInput">选择图片</label>-->
+    <input type="file" class="avatar-input" id="avatarInput" name="avatar_file"/>
+    <p class="avatar-size">上传文件大小必须小于500KB</p>
+    </div>
+
+    <!-- Crop and preview -->
+    <div class="row">
+    <div class="col-md-9">
+    <div class="avatar-wrapper"></div>
+    </div>
+    <div class="col-md-3">
+    <div class="avatar-preview preview-md"></div>
+    </div>
+    </div>
+
+    <div class="row avatar-btns" style="margin: 10px 0;">
+    <div class="col-md-9"></div>
+    <div class="col-md-3">
+    <button type="submit" class="btn btn-primary btn-block avatar-save" style="background: #f500ff; border: 1px solid #f500ff;">确认</button>
+    </div>
+    </div>
+    </div>
+    </div>
+    <!-- <div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    </div> -->
+    </form>
+    </div>
+    </div>
+    </div><!-- /.modal -->
+
+</div>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="http://tp.whjxry.net/static/home/active/js/cropper.min.js"></script>
+<script src="http://tp.whjxry.net/static/home/active/js/updateInfo.js"></script>
+
+<script>
+    $(".piaochecked").on("click", function () {
+//        $(this).hasClass("on_check") ? $(this).removeClass("on_check") : $(this).addClass("on_check");
+        //或者这么写
+        $(this).toggleClass("on_check");
+    })
+
+    //    验证表单
+    //提交，最终验证。
+    $('#submit').click(function () {
+        var username = $('#username');
+        var hobby = $('#hobby');
+        var phone = $('#phone');
+        var deal = $('#deal');
+//        console.log("可以提交");
+//        console.log($('#formId').serialize());
+        //验证用户名
+        if (username.value == "") {
+            var errorMsg = '请输入你的艺名';
+            username.parent().append('<span class="formtips onError">' + errorMsg + '</span>');
+        }
+        //验证爱好
+        if (hobby.value == "" || hobby.value.length > 12) {
+            var errorMsg = '请输入爱好（12个字以内）';
+            hobby.parent().append('<span class="formtips onError">' + errorMsg + '</span>');
+        }
+        //验证手机号
+        if (phone.value == "") {
+            var errorMsg = '请输入你的手机号码';
+            phone.parent().append('<span class="formtips onError">' + errorMsg + '</span>');
+        }
+        //验证勾选协议
+        if (deal.parent().hasClass("on_check")) {
+            return true
+        } else {
+            var okMsg = '请勾选协议';
+            deal.parent().parent().append('<span class="formtips onError">' + okMsg + '</span>');
+        }
+        $.ajax({
+            type: "post",
+            url: '',
+            dataType: 'jsonp',
+            jsonp: "callback",
+            async: false,
+            data: $('#formId').serialize(),
+            success: function(data) {
+                console.log(data);
+            }
+        })
+
+    });
+
+</script>
+</body>
+</html>

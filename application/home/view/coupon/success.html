@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<title>申请提现</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="/static/assets/css/mui.min.css" />
+		<link rel="stylesheet" type="text/css" href="/static/assets/css/style.css" />
+	</head>
+
+	<body>
+
+		<div class="mui-content mui-scroll-wrapper">
+			<div class="mui-scroll">
+				<div class="success">
+					<div class="success-img"><img src="/static/assets/images/shengqingchenggong.png" /></div>
+					<div class="success-desc">
+						<h4>提现<span class="tixian-money">{$money}</span>元 申请已提交</h4>
+						<p>在3个工作日内到账</p>
+					</div>
+					<div class="success-button">
+						<a href="/home/coupon/userCenter" class="mui-btn mui-btn-default mui-btn-block">返回个人页面</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			login = "";
+		</script>
+		<script src="/static/assets/js/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/assets/js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/assets/js/base.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			var TixianStatus = {
+				money:getQueryString('money'),				
+				init: function() {
+//					$('.tixian-money').text(TixianStatus.money)
+				},
+			};
+
+			$(function() {
+				TixianStatus.init();
+			});
+		</script>
+	</body>
+
+</html>

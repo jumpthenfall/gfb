@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<title>长久国际</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="/static/assets/css/mui.min.css" />
+		<link rel="stylesheet" type="text/css" href="/static/assets/css/icon-extra.css" />
+		<link rel="stylesheet" type="text/css" href="/static/assets/css/ui-dialog.css">
+		<link rel="stylesheet" type="text/css" href="/static/assets/css/style.css" />
+	</head>
+
+	<body>
+
+		<div class="mui-content mui-scroll-wrapper">
+			<div class="mui-scroll">
+				<div class="user-header">
+					<div class="user-avatar"><img class="useravatar" src="/static/assets/images/avatar.png" /></div>
+					<div class="user-sore">店铺：<span class="store-name storesname"></span></div>
+					<div class="user-revenue"><span class="total-revenue">总收入：<em>0.00</em>元</span></div>
+
+				</div>
+				<div class="statistics">
+					<div class="mui-row">
+						<div class="mui-col-xs-6 line-after">
+							<h3 class="revenue">0</h3>
+							<p class="count-title">渠道收入(元)</p>
+						</div>
+						<div class="mui-col-xs-6">
+							<h3 class="consume">0</h3>
+							<p class="count-title">消费奖励(元)</p>
+						</div>
+					</div>
+				</div>
+				<div class="panel user-service">
+					<div class="panel-header">
+						<h2 class="panel-header-title">店铺服务</h2>
+					</div>
+					<div class="panel-body">
+						<div class="mui-row">
+							<div class="mui-col-xs-6">
+								<div id="alertQRcode" class="recom-qrcode mui-row">
+									<div class="mui-pull-left recom-qrcode-icon icon-qudao"></div>
+									<div class="mui-pull-left recom-qrcode-desc">
+										<h3 class="qrcode-title qudao-title">推广二维码</h3>
+										<p class="qrcode-sub-title qudao-sub-title">扫描奖励30元</p>
+									</div>
+								</div>
+							</div>
+							<div class="mui-col-xs-6">
+								<div id="withdrawCash" class="withdraw-cash mui-row">
+									<div class="mui-pull-left withdraw-cash-icon icon-qudao"></div>
+									<div class="mui-pull-left withdraw-cash-desc">
+										<h3 class="cash-title qudao-title">申请提现</h3>
+										<p class="cash-sub-title qudao-sub-title">提现无次数限制</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="panel user-policy">
+					<div class="panel-header">
+						<h2 class="panel-header-title">平台政策</h2>
+					</div>
+					<div class="panel-body">
+						<p>1.推广一个人扫描二维码领取优惠券，奖励2元/人。</p>
+						<p>2.成功到店消费，奖励10元/人。</p>
+					</div>
+				</div>
+				<div class="panel user-logout">
+					<button type="button" class="mui-btn mui-btn-default mui-btn-block btn-logout">退出登录</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="wechatQrcode" style="display: none;">
+			<div class="user-info">
+				<ul class="mui-table-view">
+					<li class="mui-table-view-cell mui-media">
+						<div class="avatar mui-media-object mui-pull-left">
+							<img class="useravatar" src="/static/assets/images/avatar.png">
+						</div>
+						<div class="mui-media-body">
+							<!--<h2 class="user-name mui-ellipsis"><span class="username"></span></h2>-->
+							<p class="user-store-makeup mui-ellipsis">店铺：<span class="storesname"></span></p>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div class="wechat-qrcode">
+				<img class="talk_url" src="/static/assets/images/logo.png" />
+			</div>
+		</div>
+		<script type="text/javascript">
+			login = "home";
+		</script>
+		<script src="/static/assets/js/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/assets/js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/assets/js/dialog-plus-min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/assets/js/base.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			Home = {
+				mobile: getCookie('mobile'),
+				totalrevenue: null,
+				shopId: null,
+				init: function() {
+					mui('.mui-scroll-wrapper').scroll();
+					Home.checkLogin();
+					$('#withdrawCash').on('tap', function() {
+						location.href = '/home/Coupon/Tixian.html?totalrevenue=' + Home.totalrevenue + '&shopId=' + Home.shopId;
+					});
+
+					$('#alertQRcode').on('tap', function() {
+						var qrcode = $('#wechatQrcode').html();
+						C.artDialog(' ', qrcode);
+					});
+
+					$('.btn-logout').on('tap', function() {
+						mui.confirm('确认退出？', '提示', ['确定', '取消'], function(e) {
+							if(e.index == 0) {
+                                $.ajax({
+                                    type: "post",
+                                    url: '/home/coupon/logout?mobile=' + Home.mobile,
+                                    dataType: 'json',
+                                    success: function(res) {
+                                        delCookie('mobile');
+                                        location.href='/home/coupon/login.html';
+                                    },
+                                    error: function() {
+                                        mui.toast('网络错误，请重试！');
+                                    }
+                                })
+
+							}
+						});
+					})
+				},
+				//检测是否绑定手机号&&获取用户信息
+				checkLogin: function() {
+					$.ajax({
+						type: "post",
+						url: '/home/coupon/userCenter?ws_mobile=' + Home.mobile,
+						dataType: 'json',
+						success: function(res) {
+							if(res.code == 500) {
+								mui.confirm('请先登录！', '提示', ['确定'], function(e) {
+									if(e.index == 0) {
+										if(login == "home") {
+											C.goLogin("tip");
+										} else if(login == "login") {
+											return false;
+										} else {
+											C.goLogin();
+										}
+									}
+								});
+								return false;
+							} else {
+								var obj = res.data;
+								Home.showPageInfo(obj);
+							}
+						},
+						error: function() {
+							mui.toast('网络错误，请重试！');
+						}
+					})
+				},
+
+				showPageInfo: function(_info) {
+					var useravatar = _info.ws_head_img,
+						storesname = _info.ws_name,
+						qudaorevenue = parseFloat(_info.ws_wayTotal),
+						//daodianrevenue = parseFloat(_info.ws_costTotal),
+						xiaofeirevenue = parseFloat(_info.ws_couponTotal),
+						totalrevenue = parseFloat(qudaorevenue + xiaofeirevenue).toFixed(2),
+						qrcode = _info.ws_talk_url;
+					Home.totalrevenue = totalrevenue;
+					Home.shopId = _info.shopId;
+
+					$('.useravatar').attr('src', filesService + useravatar);
+					$('.storesname').text(storesname);
+					$('.total-revenue em').text(totalrevenue);
+					$('.revenue').text(qudaorevenue);
+					//$('.reward').text(daodianrevenue);
+					$('.consume').text(xiaofeirevenue);
+					$('.talk_url').attr('src', qrcode);
+				}
+			};
+			$(function() {
+				Home.init();
+			})
+		</script>
+	</body>
+
+</html>

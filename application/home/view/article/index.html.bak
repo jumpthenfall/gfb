@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/base.css">
+    <link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/chat.css">
+    <link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/swiper-3.4.2.min.css">
+    <script src='http://tp.whjxry.net/static/home/active/js/jquery.min.js'></script>
+    <script src='http://tp.whjxry.net/static/home/active/js/swiper-3.4.2.min.js'></script>
+    <script src='http://tp.whjxry.net/static/home/active/js/clipboard.min.js'></script>
+    <title>助攻聊吧</title>
+</head>
+<body>
+<div class="chat-container">
+
+    <div class="swiper-container">
+        <ul class="swiper-wrapper">
+            <li class="swiper-slide"><img src="http://tp.whjxry.net/static/home/active/images/articlebanner1.jpg" alt=""></li>
+            <li class="swiper-slide"><img src="http://tp.whjxry.net/static/home/active/images/articlebanner2.jpg" alt=""></li>
+        </ul>
+    </div>
+
+    <ul class="chat-content clearfix">
+        {foreach name="lists" item="vo"}
+            <li data-id="{$vo.id}" class="chat-con">
+                <div class="chat-title"><a href="{:url('article/detail',['id'=>$vo.id])}">{$vo.title}</a></div>
+                <div class="chat-date-like">
+                    <div class="chat-date">{$vo.update_time}</div>
+                    <div class="chat-like"><img src="http://tp.whjxry.net/static/home/active/images/eye_icon.png" alt=""> <span class="count">{$vo.views}</span><img style="width: 24px; height: 12px; margin-top: 3px;" src="http://tp.whjxry.net/static/home/active/images/new_icon.png" alt="" /></div>
+                    <button class="chat-btn"></button>
+
+                    <div class="detail" style="display: none;">{$vo.content}</div>
+
+                </div>
+            </li>
+        {/foreach}
+
+    </ul>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        var mySwiper = new Swiper('.swiper-container', {
+            autoplay: 5000,
+            direction: 'horizontal',
+            loop: true,
+        })
+
+        $(".chat-title a").on('click', function () {
+            var id = $(this).parents('li').data('id');
+            var span = $(this).parents('li').find('.count');
+            var count = parseInt($(this).parents('li').find('.count').text());
+            countClick(count, id, span);
+        });
+
+        $(".chat-btn").on('click', function () {
+            var id = $(this).parents('li').data('id');
+            var span = $(this).parents('li').find('.count');
+            var count = $(this).parents('li').find('.count').text();
+            countClick(count, id, span);
+        });
+
+        function countClick(count, id, span) {
+            $.ajax({
+                type: 'get',
+                url: 'http://tp.whjxry.net/api/Article/editArticleViews',
+                dataType: 'jsonp',
+                data: {
+                    id: id,
+                    viewnum: count
+                },
+                jsonp: "callback",
+                async: false,
+                success: function (data) {
+                    console.log(data);
+                    var num = data.data.views;
+                    $(span).text(num);
+                }
+            })
+        }
+
+        var clipboard = new Clipboard('.chat-btn', {
+            text: function (e) {
+                return e.parentNode.children[3].innerText;
+            }
+        });
+        clipboard.on('success', function (e) {
+            alert('复制成功！可粘贴给你的微信好友/QQ好友或者发到您的微信朋友圈/QQ空间！');
+        });
+        clipboard.on('error', function (e) {
+            alert('请选择“拷贝”进行复制!');
+        });
+
+    });
+</script>
+</body>
+</html>

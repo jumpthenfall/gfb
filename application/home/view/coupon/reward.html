@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<title>领券奖励详情</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="../assets/css/mui.min.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/css/icon-extra.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
+	</head>
+
+	<body>
+
+		<div class="mui-content reward-index">
+			<div class="reward-header">
+				<ul class="mui-table-view">
+					<li class="mui-table-view-cell">
+						<h3 class="reward-value">10254.0</h3>
+						<p>累计奖励金额500元共250人领取</p>
+					</li>
+				</ul>
+				<div class="record-count">
+					<div class="mui-row">
+						<div class="mui-col-xs-6">
+							<div class="mui-clearfix person-num">
+								<div class="record-icon">
+									<span class="mui-icon icon-reward-l"></span>
+								</div>
+								<div class="record-cont">
+									<h3 class="total-person">50</h3>
+									<p class="tips-words">今日领券人数</p>
+								</div>
+							</div>
+						</div>
+						<div class="mui-col-xs-6">
+							<div class="mui-clearfix money-num">
+								<div class="record-icon">
+									<span class="mui-icon icon-reward-r"></span>
+								</div>
+								<div class="record-cont">
+									<h3 class="total-money">500</h3>
+									<p class="tips-words">今日领券金额</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="reward-title">
+				历史记录
+			</div>
+			<div class="reward-content">
+				<div id="pullRefresh" class="mui-scroll-wrapper">
+					<div class="mui-scroll">
+						<ul id="rewardList" class="reward-list mui-table-view">
+
+							<li class="mui-table-view-cell mui-media" datas-clerkid="1">
+								<a href="javascript:;">
+									<img class="mui-media-object mui-pull-left avatar-list" src="http://placehold.it/40x30">
+									<div class="mui-media-body">
+										<div class="mui-row">
+											<div class="mui-col-xs-8">
+												<p class="mui-ellipsis"><span class="record-name">大熊</span></p>
+												<p class="mui-ellipsis"><span class="record-time">2017-09-01 23:56</span></p>
+											</div>
+											<div class="mui-col-xs-4"><span class="mui-pull-right consumption-plus">+1000元</span></div>
+										</div>
+									</div>
+								</a>
+							</li>
+							<li class="mui-table-view-cell mui-media" datas-clerkid="1">
+								<a href="javascript:;">
+									<img class="mui-media-object mui-pull-left avatar-list" src="http://placehold.it/40x40">
+									<div class="mui-media-body">
+										<div class="mui-row">
+											<div class="mui-col-xs-8">
+												<p class="mui-ellipsis"><span class="record-name">大熊</span></p>
+												<p class="mui-ellipsis"><span class="record-time">2017-09-01 23:56</span></p>
+											</div>
+											<div class="mui-col-xs-4"><span class="mui-pull-right consumption-plus">+1000元</span></div>
+										</div>
+									</div>
+								</a>
+							</li>
+
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="../assets/js/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../assets/js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../assets/js/base.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			var Reward = {
+				data: {
+					beginPage: 1,
+					counts: 20
+				},
+				init: function() {
+					Reward.showRewardList();
+				},
+				showRewardList: function() {
+					mui.init({
+						pullRefresh: {
+							container: "#pullRefresh",
+							up: {
+								height: 50,
+								auto: true,
+								contentrefresh: "正在加载...",
+								contentnomore: '没有数据了...',
+								callback: function() {
+									Reward.getRewardList()
+								}
+							}
+						}
+					});
+				},
+				getRewardList: function() {
+					var data = Reward.data;
+					C.ajaxRequest("post", "dresserAction/dresserDayIncome.action?", data, function(res) {
+						if(res.code == 0) {
+							var obj = res.result;
+							if(obj.dresserDayCostList.length > 0) {
+								var p = Reward.data.beginPage;
+								if(p >= obj.countsTotal / Reward.data.counts) {
+									mui('#pullRefresh').pullRefresh().endPullupToRefresh(true);
+								} else {
+									p++;
+									mui('#pullRefresh').pullRefresh().endPullupToRefresh();
+								}
+								Reward.data.beginPage = p;
+								var list = obj.dresserDayCostList;
+								for(i in list) {
+									var _item = Reward.renderRewardList(list[i]);
+									$("#rewardList").append(_item);
+								}
+							} else {
+								mui("#pullRefresh").pullRefresh().endPullupToRefresh(true);
+							}
+						}
+					})
+				},
+				renderRewardList: function(d) {
+					var html = [];
+					html.push('	<a href="javascript:;">');
+					html.push('		<img class="mui-media-object mui-pull-left clerk-avatar" src="' + d.headimgurl + '">');
+					html.push('		<div class="mui-media-body">');
+					html.push('			<div class="mui-row">');
+					html.push('				<div class="mui-col-xs-9">');
+					html.push('					<p class="clerk-day-way mui-ellipsis">' + d.nickname + '</p>');
+					html.push('					<p class="clerk-day-time mui-ellipsis">' + d.finishtime + '</p>');
+					html.push('				</div>');
+					html.push('				<div class="mui-col-xs-3"><span class="clerk-day-money">' + d.price + '元</span></div>');
+					html.push('			</div>');
+					html.push('		</div>');
+					html.push('	</a>');
+
+					var li = document.createElement('li');
+					li.className = 'mui-table-view-cell mui-media';
+					li.dataset.clerkdayid = d.id;
+					li.innerHTML = html.join('');
+					return li;
+				}
+			};
+
+			$(function() {
+				Reward.init();
+			});
+		</script>
+	</body>
+
+</html>

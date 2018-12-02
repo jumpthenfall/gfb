@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/base.css">
+    <link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/rank.css">
+
+    <script src="http://tp.whjxry.net/static/home/active/js/jquery.min.js"></script>
+    <title>封神榜</title>
+</head>
+<body>
+<div class="container" style="height: 100%">
+    <div class="rank-container">
+        <!--top3-->
+        <div class="top clearfix">
+            <ul>
+                <li class="top2">
+                    <img class="top2-fans-img" src="{$ranklisttop[1]['headimgurl']}" alt="">
+                    <img class="top2-img" src="http://tp.whjxry.net/static/home/active/images/NO.2.png" alt="">
+                    <span class="name">{$ranklisttop[1]['nickname']}</span>
+                    <span class="money">贡献：{$ranklisttop[1]['popularValue']}人气</span>
+                </li>
+                <li class="top1">
+                    <img class="top1-fans-img" src="{$ranklisttop[0]['headimgurl']}" alt="">
+                    <img class="top1-img" src="http://tp.whjxry.net/static/home/active/images/NO.1.png" alt="">
+                    <span class="name">{$ranklisttop[0]['nickname']}</span>
+                    <span class="money">贡献：{$ranklisttop[0]['popularValue']}人气</span>
+                </li>
+                <li class="top3">
+                    <img class="top3-fans-img" src="{$ranklisttop[2]['headimgurl']}" alt="">
+                    <img class="top3-img" src="http://tp.whjxry.net/static/home/active/images/NO.3.png" alt="">
+                    <span class="name">{$ranklisttop[2]['nickname']}</span>
+                    <span class="money">贡献：{$ranklisttop[2]['popularValue']}人气</span>
+                </li>
+            </ul>
+        </div>
+        <!--rankTitle-->
+        <div class="rank-title">
+            <div class="rank-title-content">
+                <img src="http://tp.whjxry.net/static/home/active/images/rank.png" alt="">
+                <p>给女神投人气最多的前三名，可以坐上封神席位！</p>
+            </div>
+        </div>
+        <!--月排行和日排行-->
+        <div class="rank-content">
+            <div id="wrap">
+                <div id="tit">
+                    <span class="select"><em>月排行榜</em></span>
+                    <span><em>日排行榜</em></span>
+                </div>
+                <ul id="con">
+                    <li class="month-exist show">
+                        
+                        {foreach name="ranklistres" item="vo" key="k"}
+                            <div class="month">
+                                <em class="month-num">{$k+4}</em>
+                                <img class="month-img" src="{$vo.headimgurl}" alt="">
+                                <div class="month-info">
+                                    <span class="month-info-name">{$vo.nickname}</span>
+                                    <span class="month-info-money">贡献人气值：{$vo.popularValue}</span>
+                                </div>
+                            </div>
+                        {/foreach}
+                    </li>
+                    <li class="day-exist">
+                        {foreach name="rankresinfo" item="vo" key="k"}
+                        <div class="day">
+                            <em class="day-num">{$k+1}</em>
+                            <img class="day-img" src="{$vo.headimgurl}" alt="">
+                            <div class="day-info">
+                                <span class="day-info-name">{$vo.nickname}</span>
+                                <span class="day-info-time">{$vo.sendtime|date="Y-m-d H:i:s",###}</span>
+                            </div>
+                            <div class="day-money">
+                                <span class="day-money-text">{$vo.popularValueres}</span>
+                                <span class="day-money-help">贡献人气</span>
+                            </div>
+                        </div>
+                        {/foreach}
+
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#tit span').click(function() {
+            var i = $(this).index();
+            $(this).addClass('select').siblings().removeClass('select');
+            $('#con li').eq(i).show().siblings().hide();
+        });
+
+        function layout(){
+            var maxHeight = $(window).height()- 316;
+            $(".month-exist").css("max-height",maxHeight);
+            $(".day-exist").css("max-height",maxHeight);
+        }
+        layout();
+        $(window).resize(function(){layout()});
+
+        isExist();
+
+        function isExist(){
+            if($("li.show").has("div.month")) {
+                if($(".month").length == 0) {
+                    $("li.month-exist").prepend("<div class='no-exist'>暂无相关数据</div>");
+                }
+            }
+
+            if($("li.show").has("div.day")) {
+                if($(".day").length == 0) {
+                    $("li.day-exist").prepend("<div class='no-exist'>暂无相关数据</div>");
+                }
+            }
+        }
+    </script>
+</div>
+</body>
+</html>

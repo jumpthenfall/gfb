@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+
+    <link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/base.css">
+    <link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/style.css">
+    <script src="http://tp.whjxry.net/static/home/active/js/jquery.min.js"></script>
+    <title>女神来啦！</title>
+    <script src="http://tp.whjxry.net/static/home/active/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript">
+       
+        var url_tz = '<?php echo $jssdk["url"];?>';
+
+
+        wx.config({
+          appId: '<?php echo $jssdk["appId"];?>',
+          timestamp: <?php echo $jssdk["timestamp"];?>,
+          nonceStr: '<?php echo $jssdk["nonceStr"];?>',
+          signature: '<?php echo $jssdk["signature"];?>',
+          jsApiList: [
+            'onMenuShareTimeline',
+            'onMenuShareAppMessage',
+            'onMenuShareQQ',
+            'onMenuShareWeibo',
+            'onMenuShareQZone'
+          ]
+        });
+
+
+       
+
+    </script>
+
+        
+</head>
+<body>
+<div class="container">
+    <!--banner-->
+    <div class="banner">
+        <a href="#"><img id="banner" src="http://tp.whjxry.net/static/home/active/images/banner_{$storesid}.jpg" alt=""></a>
+    </div>
+
+    <!--search-->
+    <div id="searchAnchor"></div>
+    <div id="searchbox">
+        <form action="">
+            <div class="search">
+                <div class="search-input">
+                    <div class="search-icon"><img src="http://tp.whjxry.net/static/home/active/images/search_icon.png" alt=""/></div>
+                    <input type="search" id="search" placeholder="输入姓名搜索" id="search">
+                </div>
+                <div class="search-button">
+                    <button id="searchForm" type="button">搜&nbsp;索</button>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </form>
+    </div>
+
+    <!--product-->
+    <div class="products clearfix">
+        <ul id="wrap">
+
+        </ul>
+    </div>
+
+</div>
+
+<input type="hidden" id="storesid" value="{$storesid}">
+<input type="hidden" id="uid" value="<?php echo session('uid');?>">
+<input type="hidden" id="code" value="{$code}">
+
+
+
+
+
+    <srcipt src="http://tp.whjxry.net/static/home/active/js/demo.js"></srcipt>
+    <script type="text/javascript">
+      var imgUrl = $('#banner').attr('src');
+
+      wx.ready(function(){
+        
+          var shareData = {
+            title: '喜欢我，就来点我吧！礼物刷刷刷！！！',
+            desc: '没有早一步，没有晚一步，于万千人海中，我们相遇。为我助攻，传递一份情，让美点亮你我的生活！',
+            link: url_tz,
+            imgUrl: imgUrl
+          };
+          wx.onMenuShareAppMessage(shareData);
+          wx.onMenuShareTimeline(shareData);
+          wx.onMenuShareQQ(shareData);
+          wx.onMenuShareWeibo(shareData);
+          wx.onMenuShareQZone(shareData);
+      });
+
+    </script>
+
+
+    <script src="http://tp.whjxry.net/static/home/active/js/base.js"></script>
+    <script src="http://tp.whjxry.net/static/home/active/js/index.js"></script>
+
+ <script type="text/javascript">
+   // window.location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxa7d04aa2082e7edb&redirect_uri=http://tp.whjxry.net/oauth2.php&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect";
+   /*alert(99);
+   var code = <?php echo $code;?>;
+
+   alert(code);
+   var storesid = <?php echo $storesid;?>;
+   var uid = <?php echo $uid;?>;
+   alert(uid);*/
+
+   var code_tp = $("#code").val();
+   var storesid_tp = $("#storesid").val();
+   var uid_tp = <?php echo session('uid');?>;
+   //alert(code_tp);
+
+   if(uid_tp == null){
+    window.location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx1a977e6944e78282&redirect_uri=http://tp.whjxry.net/home/active/index/storesid/"+storesid_tp+".html&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect";
+   }
+  // window.location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxa7d04aa2082e7edb&redirect_uri=http://tp.whjxry.net/user/index.html&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect";
+    </script>
+    
+   
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/base.css">
+    <link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/chat.css">
+    <script src='http://tp.whjxry.net/static/home/active/js/jquery.min.js'></script>
+    <script src='http://tp.whjxry.net/static/home/active/js/clipboard.min.js'></script>
+    <title>聊吧-软文详情</title>
+</head>
+<body>
+<div class="chat-detail-container">
+    <div id="chat-detail">{$oneinfo.content}</div>
+    <button class="btn"></button>
+    
+</div>
+
+<div class="message">
+    <div class="hr"></div>
+    <div class="message-title"><span>精彩评论</span></div>
+
+    {foreach name="commentinfo" item="vo"}
+    <div class="message-con">
+        <if condtion="$vo.headimgurl eq null">
+             <img src="http://tp.whjxry.net/static/home/active/images/pp.png" alt="">
+        <else />
+             <img src="{$vo.headimgurl}" alt="">
+        </if>
+        <div class="message-content">
+            <div class="mes-user-name">匿名</div>
+            <div class="mes-user-con">{$vo.content}</div>
+            <div class="mes-user-time">{$vo.update_time}</div>
+            <div class="hr"></div>
+        </div>
+    </div>
+    {/foreach}
+    
+</div>
+
+<div class="write-mes">
+            <form id="myform" method="post">
+                <div class="write-mes-input">
+                    <input type="text" name="content" class="mesInput">
+                    <input type="hidden" name="article_id" value="{$oneinfo.id}" />
+
+                    <input type="hidden" name="uid" value="{$uid}" />
+
+                    <img src="http://tp.whjxry.net/static/home/active/images/comment2_icon.png" alt="">
+                </div>
+                <button type="submit" class="write-mes-btn"></button>
+            </form>
+        </div>
+
+        <script>
+            $(document).ready(function() {
+                $('.write-mes').on('submit', '#myform', function() {
+                    var contText = $.trim($('input[name="content"]').val());
+                    if(contText.length <= 0) {
+                        alert('不能为空，请填写信息！');
+                        return false;
+                    } else {
+                        $.ajax({
+                            type: "get",
+                            url: 'http://tp.whjxry.net/home/article/comment',
+                            dataType: 'jsonp',
+                            jsonp: "callback",
+                            async: false,
+                            data: $(this).serialize(),
+                            success: function(data) {
+                                if(data.code == 1) {
+                                    alert("评论成功！");
+                                    location.reload();
+                                }
+                            },
+                            error: function(data) {
+                                console.log(data.message)
+                            }
+                        })
+                    }
+                    console.log(contText.length)
+                    return false;
+                });
+                $(".mesInput").on("focus", function() {
+                    setTimeout(function() {
+                        document.body.scrollTop = document.body.scrollHeight;
+                    }, 300);
+                })
+
+                var clipboard = new Clipboard('.btn', {
+                    text: function(e) {
+                        return e.parentNode.children[0].innerText;
+                    }
+                });
+                clipboard.on('success', function(e) {
+                    alert('复制成功！可粘贴给你的微信好友/QQ好友或者发到您的微信朋友圈/QQ空间！');
+                });
+                clipboard.on('error', function(e) {
+                    alert('请选择“拷贝”进行复制!');
+                });
+
+            });
+        </script>
+    </body>
+
+</html>

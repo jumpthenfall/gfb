@@ -1,0 +1,206 @@
+{include file="public/header" /}
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>申请列表</h5>
+        </div>
+        <div class="ibox-content">        
+            <div class="row">
+                <div class="col-sm-12">   
+                    <form name="admin_list_sea" class="form-search" method="post" action="{:url('before_confirm')}" id="myForm">
+                        <div class="col-md-3">
+                            <input type="text" id="key" name="key" value="{$key}" class="form-control" placeholder="输入查询手机号码">
+                            <input type="hidden"  name="status" value="1" class="form-control" placeholder="">
+                        </div>
+                        <div class="col-md-6">
+                            <input class="form-control layer-date" placeholder="开始时间" id="starttime" name="starttime" value="{$starttime}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+                            <input class="form-control layer-date" placeholder="结束时间" id="endtime" name="endtime" value="{$endtime}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+                        </div>
+                        <!--<div class="col-md-3">-->
+                        <!--<label class="col-sm-5" style="line-height: 30px;">订单状态：</label>-->
+                        <!--<div class="col-sm-6">-->
+                        <!--<select class="form-control" id="status" name="status">-->
+                        <!--&lt;!&ndash;<option value="0"{selected==请选择==</option>&ndash;&gt;-->
+                        <!--<option value="3" selected>运营发起</option>-->
+                        <!--<option value="7" selected>财务已拒绝</option>-->
+                        <!--<option value="8" selected>财务已确认</option>-->
+                        <!--<option value="9" selected>财务已转账</option>-->
+                        <!--</select>-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <div class="col-md-6" style="float: right;margin-bottom: 10px;margin-top: 10px;margin-right: 40px;">
+                            <button class="pull-right btn btn-success" type="button" id="dataExport"><i class="fa fa-download"></i> 导出</button>
+                            <button class="pull-right btn btn-primary" type="submit" style="margin-right: 5px;"><i class="fa fa-save"></i> 搜索</button>
+                        </div>
+                        
+                    </form>                         
+                </div>
+            </div>
+            <div class="example-wrap">
+                <div class="example">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="long-tr">
+                                <th>序号</th>
+                                <th>手机号</th>
+                                <th>提现账号</th>
+                                <th>提现用户名</th>
+                                <th>提现金额</th>
+                                <th>申请时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <script id="arlist" type="text/html">
+                            {{# for(var i=0;i<d.length;i++){  }}
+                            <tr class="long-td">
+                                <td>{{i+1}}</td>
+                                <td>
+                                    {{d[i].mobile}}
+                                    <input type="hidden" re_id="{{d[i].id}}" id="reverse_{{i}}">
+                                </td>
+                                <td>{{d[i].account}}</td>
+                                <td>{{d[i].account_name}} </td>
+                                <td>{{d[i].money}} </td>
+                                <td>{{d[i].add_time}} </td>
+                                <td>
+
+                                    <a href="javascript:;" onclick="update_order({{d[i].id}},2)" class="btn btn-primary btn-outline btn-xs">
+                                           确认汇款</a>
+
+                                    <a href="javascript:;" onclick="update_order({{d[i].id}},3)" class="btn btn-danger btn-outline btn-xs">
+                                           拒绝申请</a>
+
+                                </td>
+                            </tr>
+                            {{# } }}
+                        </script>
+                        <tbody id="article_list"></tbody>
+                    </table>
+                    <div id="AjaxPage" style=" text-align: right;"></div>
+                    <div id="allpage" style=" text-align: right;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+</div>
+<input type="hidden" id="Nowpage" value="{$Nowpage}">
+<!-- 加载动画 -->
+<div class="spiner-example">
+    <div class="sk-spinner sk-spinner-three-bounce">
+        <div class="sk-bounce1"></div>
+        <div class="sk-bounce2"></div>
+        <div class="sk-bounce3"></div>
+    </div>
+</div>
+
+{include file="public/footer" /}
+
+<script type="text/javascript">
+    $(function () {
+//        $("#dataExport").on("click",function(){
+//            dataExport();
+//        })
+//
+//        function dataExport(){
+//            var data=$("#myForm").serialize();
+//            $.getJSON("{:url('export_data')}", data, function(res){
+//                if(res.code == 1){
+//                    var urlxls=res.data;
+//                    window.location.href= urlxls;
+//
+//                }else{
+//                    layer.msg(res.msg,{icon:0,time:1500,shade: 0.1});
+//                }
+//            });
+//        }
+        $("#dataExport").on("click",function(){
+            layer.load();
+            dataExport();
+        })
+
+        function dataExport(){
+            var data=$("#myForm").serialize();
+            var url = "{:url('export_data')}" + '?' + data;
+            window.location.href = "__HTTP__" + url;
+            layer.closeAll();
+        }
+    })
+    /**
+     * [Ajaxpage laypage分页]
+     * @param {[type]} curr [当前页]
+     * @Author''
+     */ 
+    function Ajaxpage(curr){
+        if(curr){
+            $('#Nowpage').val(curr);
+        }
+        var starttime=$('#starttime').val();
+        var endtime=$('#endtime').val();
+        var status=$('#status').val();
+        var pay_type=$('#pay_type').val();
+        var key=$('#key').val();
+        $.getJSON('{:url("before_confirm")}', {
+            page: curr || 1,starttime:starttime,endtime:endtime,status:status,key:key,pay_type:pay_type
+        }, function(data){      //data是后台返回过来的JSON数据
+
+            $(".spiner-example").css('display','none'); //数据加载完关闭动画           
+            if(data==''){
+                $("#article_list").html('<td colspan="20" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
+            }else{
+                article_list(data); //模板赋值
+                laypage({
+                    cont: $('#AjaxPage'),//容器。值支持id名、原生dom对象，jquery对象,
+                    pages:'{$allpage}',//总页数
+                    skip: true,//是否开启跳页
+                    skin: '#1AB5B7',//分页组件颜色
+                    curr: curr || 1,
+                    groups: 3,//连续显示分页数
+                    jump: function(obj, first){
+
+                        if(!first){
+                            Ajaxpage(obj.curr)
+                        }
+                        $('#allpage').html('第'+ obj.curr +'页，共'+ obj.pages +'页');
+                    }
+                });
+            }
+        });
+    }
+
+    Ajaxpage();
+
+    /**
+     * [article_list 接收异步获取的数据渲染到模板]
+     * @Author''
+     */
+    function article_list(list){
+
+        var tpl = document.getElementById('arlist').innerHTML;
+        laytpl(tpl).render(list, function(html){
+            document.getElementById('article_list').innerHTML = html;
+        });
+    }
+
+    //申请退单
+    function update_order(id,status){
+        url = "{:url('change_status')}"
+        layer.confirm('确认操作?', {icon: 3, title:'确认提示'}, function(index){
+            $.getJSON(url, {'id' : id,status:status}, function(res){
+                if(res.code == '200'){
+                    layer.msg('操作成功',{icon:1,time:1500,shade: 0.1});
+                     Ajaxpage()
+                }else{
+                    layer.msg(res.msg,{icon:0,time:1500,shade: 0.1});
+                }
+            });
+            layer.close(index);
+        })
+    }
+
+
+</script>
+</body>
+</html>

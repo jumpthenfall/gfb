@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<title>个人中心</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="/static/assets/css/mui.min.css" />
+		<link rel="stylesheet" type="text/css" href="/static/assets/css/icon-extra.css" />
+		<link rel="stylesheet" type="text/css" href="/static/assets/css/ui-dialog.css">
+		<link rel="stylesheet" type="text/css" href="/static/assets/css/style.css" />
+	</head>
+
+	<body>
+
+		<div class="mui-content mui-scroll-wrapper">
+			<div class="mui-scroll">
+				<div class="user-header">
+					<div class="user-avatar"><img class="useravatar" src="/static/assets/images/avatar.png" /></div>
+					<div class="user-sore"><span class="store-name storesname">瓜分宝用户</span></div>
+				</div>
+
+				<div class="panel user-service">
+					<div class="panel-header">
+						<h2 class="panel-header-title">服务信息</h2>
+					</div>
+					<div class="panel-body">
+						<ul class="mui-table-view user-service-list">
+							<li class="mui-table-view-cell user-service-list-item">
+								<span class="mui-icon icon-beer-name"></span>
+								<span class="user-service-title">存酒品名：</span>
+								<span class="user-service-text">雪花勇闯天涯</span>
+
+							</li>
+							<li class="mui-table-view-cell user-service-list-item">
+								<span class="mui-icon icon-beer-total"></span>
+								<span class="user-service-title">累计存酒：</span>
+								<span class="user-service-text">{$count}</span>
+
+							</li>
+							<li class="mui-table-view-cell user-service-list-item">
+								<span class="mui-icon icon-beer-surplus"></span>
+								<span class="user-service-title">剩余存酒：</span>
+								<span class="user-service-text">{$number}</span>
+
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="panel user-service">
+					<div class="panel-header">
+						<h2 class="panel-header-title">使用说明</h2>
+					</div>
+					<div class="panel-body">
+						<ul class="mui-list-unstyled use-explain">
+							<li>① 所有酒类现存期限：无限制； </li>
+							<li>② 活动仅限雪花勇闯天涯啤酒；</li>
+							<li>③ 1000元存酒活动每次消费仅限100瓶；</li>
+							<li>④ 本活动适用于瓜分宝所有联盟门店；</li>
+							<li>⑤ 有疑问请咨询15392914040；</li>
+							<li>⑥ 最终解释权归瓜分宝所有；</li>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<script src="/static/assets/js/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/assets/js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/assets/js/dialog-plus-min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/assets/js/base.js" type="text/javascript" charset="utf-8"></script>
+		<<script type="text/javascript">
+            Individual = {
+                mobile: <?php echo $is_login ;?>,
+                init: function() {
+                    mui('.mui-scroll-wrapper').scroll();
+                    if(!Individual.mobile) {
+                        var btnArray = ['确定'];
+                        mui.prompt('请输入手机号查询个人信息', '请输入手机号', '提示', btnArray, function(e) {
+                            if(e.index == 0) {
+                                console.log(e.value)
+                                location.href = '/home/talk/usercenter?type=login&phone=' + e.value
+                            }
+                        })
+                    }
+                },
+
+            };
+            $(function() {
+                Individual.init();
+            })
+		</script>
+	</body>
+
+</html>

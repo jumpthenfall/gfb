@@ -1,0 +1,427 @@
+{include file="public/header" /}
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-content">
+            <div class="example-wrap">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">订单号：</label>
+                        <div class="input-group col-sm-4">
+                            <input class="form-control"  value="{$order_detail.mo_number}" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">用户名：</label>
+                        <div class="input-group col-sm-4">
+                            <input class="form-control"  value="{$order_detail.username}" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">下单人电话：</label>
+                        <div class="input-group col-sm-4">
+                            <input class="form-control"  value="{$order_detail.register_mobile}" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">订单优惠金额：</label>
+                        <div class="input-group col-sm-4">
+                            <input class="form-control"  value="{$order_detail.mo_sales_price}" readonly>
+                        </div>
+                    </div>
+                    {foreach name="pay_info" item="pay"}
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">{$pay.pay_type}：</label>
+                        <div class="input-group col-sm-4">
+                            <input class="form-control"  value="{$pay.mop_price}" readonly>
+                        </div>
+                    </div>
+                    {/foreach}
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">订单实付金额：</label>
+                        <div class="input-group col-sm-4">
+                            <input class="form-control"  value="{$order_detail.mo_pay_price}" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">订单状态：</label>
+                        <div class="input-group col-sm-4">
+                            <input class="form-control"  value="{$order_detail.status}" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">下单时间：</label>
+                        <div class="input-group col-sm-4">
+                            <input class="form-control"  value="{$order_detail.order_time}" readonly>
+                        </div>
+                    </div>
+                    {if $order_detail.certificate_name}
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">姓名：</label>
+                        <div class="input-group col-sm-4">
+                            <input class="form-control"  value="{$order_detail.certificate_name}" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">身份证号码：</label>
+                        <div class="input-group col-sm-4">
+                            <input class="form-control"  value="{$order_detail.certificate_number}" readonly>
+                        </div>
+                    </div>
+                    {/if}
+                    {if $order_detail eq 2}
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">支付时间：</label>
+                        <div class="input-group col-sm-4">
+                            <input class="form-control"  value="{$order_detail.pay_time}" readonly>
+                        </div>
+                    </div>
+                    {/if}
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">订单备注：</label>
+                        <div class="input-group col-sm-9">
+                            <input class="form-control"  value="{$order_detail.mo_remark}" readonly>
+                        </div>
+                    </div>
+                    {if $order_detail.addressline}
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">收货人姓名：</label>
+                        <div class="input-group col-sm-4">
+                            <input class="form-control" id="receiver_name"  value="{$order_detail.name}" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">收货人电话：</label>
+                        <div class="input-group col-sm-4">
+                            <input class="form-control" id="receiver_phone"  value="{$order_detail.cellphone}" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">收货地址区域：</label>
+                        <div class="input-group col-sm-4">
+                            <input class="form-control" id="receiver_pca"  value="{$order_detail.region}" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">收货详细地址：</label>
+                        <div class="input-group col-sm-9">
+                            <input class="form-control" id="receiver_detailed"  value="{$order_detail.addressline}" readonly>
+                            {if $order_detail.mo_status eq 2} 
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-danger change_address">修改收货信息</button>
+                            </span>
+                            {/if}
+                        </div>
+                    </div>
+                    {/if}
+                    <input type="hidden" id="order_id" value="{$order_detail.id}">
+                </form>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="example-wrap">
+                <div class="example">
+                    <div class="ibox-title">
+                        <h5>订单商品列表</h5>
+                        <div class="ibox-footer" style="float: right;">
+                            {if $order_detail.mo_status == 2}
+                                {if $order_detail.mo_delivery_type == 2}
+                                    <a href="javascript:;" onclick="delivery_update({$order_detail.id})" class="btn btn-primary myModal">发货</a>
+                                {else}
+                                    <button href="javascript:;" detailid="{$order_detail.id}" data-toggle="" data-target="#myModal" class="btn btn-primary recharge_submit myModal" type="button"><i class="fa fa-save">发货</i> </button>
+                                    <button href="javascript:;" detailid="{$order_detail.id}" class="btn btn-primary update_delivery" type="button"><i class="fa fa-save">修改</i> </button>
+                                {/if}
+                            {elseif $order_detail.mo_status == 3}
+                                <button href="javascript:;" detailid="{$order_detail.id}" class="btn btn-primary update_delivery" type="button"><i class="fa fa-save">修改</i> </button>
+                            {/if}
+                        </div>
+                    </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="long-tr">
+                                <th width="">ID</th>
+                                <th width="18%">商品名</th>
+                                <th width="">规格</th>
+                                <th width="">商品编码</th>
+                                <th width="">售价</th>
+                                <th width="">数量</th>
+                                <th width="">商品金额</th>
+                                <th width="">会员折扣</th>
+                                <th width="">实际收款</th>
+                                <th width="">供应商</th>
+                                <th width="">发货时间</th>
+                                <th width="">签收时间</th>
+                                <th width="">快递公司</th>
+                                <th width="">单号</th>
+                            </tr>
+                        </thead>
+                        <tbody id="list-content">
+                            {if $order_list}
+                            {foreach name="order_list" item="d"}
+                            <td>{if $d.logistics_id}{else}<input type="checkbox" value="{$d.id}" name="ids" style="line-height: 30px;margin-right: 5px;">{/if}{$d.id}</td>
+                            <td>{$d.goods_name}</td>
+                            <td>{$d.goods_attribute}</td>
+                            <td>{$d.sn}</td>
+                            <td>{$d.goods_price}</td>
+                            <td>{$d.mod_number}</td>
+                            <td>{$d.mo_pay_price}</td>
+                            <td>无</td>
+                            <td>{$d.mo_pay_price}</td>
+                            <td>{$d.supplier_name}</td>
+                            <td>{$d.delivery_time}</td>
+                            <td>{$d.take_time}</td>
+                            <td>
+                            {if $d.logistics_id}<select style="display: none" class="edit_log_update" order_id="{$d.id}" logistics_id="{$d.logistics_id}" name="mol_ml_id">
+                                {foreach name="logistics" item="vv"}
+                                <option value="{$vv.id}" {if $d.mol_ml_id == $vv.id}selected{/if}>{$vv.ml_name}</option>
+                                {/foreach}
+                            </select>{else}{/if}
+                            <span class="edit_log">{$d.logistics_name}</span></td>
+                            <td>{if $d.logistics_id}<input style="display: none" type="text" class="edit_log_update" order_id="{$d.id}" logistics_id="{$d.logistics_id}" name="mol_oddNumbers" value="{$d.mol_oddNumbers}">{else}{/if}<span class="edit_log">{$d.mol_oddNumbers}</span></td>
+                            </tr>
+                            {/foreach}
+                            {else}
+                            <tr>
+                                <td colspan="20" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>
+                            </tr>
+                            {/if}
+                        </tbody>
+                    </table>
+                    <div id="AjaxPage" style=" text-align: right;"></div>
+                    <div id="allpage" style=" text-align: right;"></div>
+                </div>
+            </div>
+            
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+</div>
+
+{include file="public/footer" /}
+<div id="layer-photos-demo" class="layer-photos-demo" style="background: rgba(0,0,0,.5);position: fixed; left: 0; top: 0;z-index: 9999;width: 100%;height: 100%;text-align: center;display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close dj_close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h3 class="modal-title">添加物流</h3>
+            </div>
+            <form class="form-horizontal" name="order_detail" id="order_detail" method="post" action="{:url('order_detail')}">
+                <div class="ibox-content">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">物流公司： </label>
+                        <div class="col-sm-8">
+                            <select name="mol_ml_id" id="mol_ml_id" class="form-control">
+                                <option value="">--默认顶级--</option>
+                                {if !empty($logistics)}
+                                {foreach name="logistics" item="v"}
+                                <option value="{$v.id}">{$v.ml_name}</option>
+                                {/foreach}
+                                {/if}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">物流单号： </label>
+                        <div class="col-sm-8">
+                            <input type="text" name="mol_oddNumbers" id="mol_oddNumbers" placeholder="输入快递单号" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">发货数量： </label>
+                        <div class="col-sm-8">
+                            <input type="text" name="mol_number" id="mol_number" placeholder="发货数量" class="form-control"/>
+                        </div>
+                    </div>
+                    <input type="hidden" name="ids_value" id="ids_value"  value="">
+                    <!-- <div class="hr-line-dashed"></div> -->
+                    <!-- <div class="form-group">
+                        <label class="col-sm-3 control-label">发货时间： </label>
+                        <div class="col-sm-8">
+                            <input class="form-control layer-date" placeholder="发货时间" id="mol_sendTime" name="mol_sendTime" value="" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+                            <label class="laydate-icon"></label>
+                        </div>
+                    </div> -->
+                    <div class="hr-line-dashed"></div>
+                    <input type="hidden" name="detail_id" id="detail_id" value="{$order_detail.id}">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> 保存</button>
+                    <button type="button" class="btn btn-danger dj_close" data-dismiss="modal"><i class="fa fa-close"></i> 关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal  fade" id="myModal" tabindex="-1" role="dialog"  aria-hidden="true">
+    
+</div>
+<script type="text/javascript">
+    
+    $(function () {
+        $(".edit_log_update").blur(function(){
+            var value = $(this).val();
+            var key = $(this).attr('name');
+            var order_id = $(this).attr("order_id");
+            var logistics_id = $(this).attr("logistics_id");
+            $.getJSON('{:url("update_logistics")}',{order_id:order_id,logistics_id:logistics_id,key:key,value:value},function (res) {
+                if(res.code == '00000'){
+                    layer.msg('更新物流信息成功', {icon: 6,time:1500,shade: 0.1});
+                    window.location.reload();
+                }else{
+                    layer.msg(res.message, {icon: 5,time:1500,shade: 0.1});
+                }
+            })
+        });
+
+
+        $(".update_delivery").click(function(){
+            $(".edit_log").hide();
+            $(".edit_log_update").show();
+        })
+
+        $(".myModal").click(function(){
+            $(this).attr('detailid');
+            obj = document.getElementsByName("ids");
+            check_val = [];
+            for(k in obj){
+                if(obj[k].checked)
+                    check_val.push(obj[k].value);
+            }
+            if(check_val.length == 0){
+                layer.msg('请选择发货的子订单',{icon:0,time:1500,shade: 0.1,});
+                return false
+            }
+            $("#ids_value").val(check_val.join(","));
+            $("#layer-photos-demo").show();
+        })
+
+        $(".dj_close").click(function(){
+            $("#layer-photos-demo").hide();
+        })
+        //点击赋值
+        $('#list-content').delegate('.detail-express','click',function () {
+            $('#detail_id').val($(this).attr('detailid'));
+        })
+
+        $('#order_detail').ajaxForm({
+            beforeSubmit: checkForm,
+            success: complete,
+            dataType: 'json'
+        });
+
+        function checkForm(){
+            if( '' == $.trim($('#mol_ml_id').val())){
+                layer.msg('请选择物流',{icon:2,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            }
+
+            if( '' == $.trim($('#mol_oddNumbers').val())){
+                layer.msg('请输入物流单号',{icon:0,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            }if( '' == $.trim($('#mol_number').val())){
+                layer.msg('请输入发货量',{icon:0,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            // }if( '' == $.trim($('#mol_sendTime').val())){
+            //     layer.msg('请选择发货时间',{icon:0,time:1500,shade: 0.1}, function(index){
+            //         layer.close(index);
+            //     });
+            //     return false;
+            }
+        }
+
+
+        function complete(data){
+            if(data.code=='00000'){
+                layer.msg('发货成功', {icon: 6,time:1500,shade: 0.1}, function(index){
+                    window.location.reload();
+                });
+                return false;
+            }else{
+                layer.msg(data.message, {icon: 5,time:3500,shade: 0.1});
+                window.location.reload();
+                return false;
+            }
+        }
+
+        //修改收货信息
+        $('.input-group-btn').delegate('.change_address','click',function () {
+           if(!confirm('确认修改收货信息？')){
+               return false;
+           }
+            $('#receiver_name, #receiver_phone, #receiver_pca,#receiver_detailed').removeAttr('readonly');
+            $(this).replaceWith('<button type="button" class="btn btn-primary save_receiver_address">确认修改</button>')
+        })
+        //提交收货信息
+        $('.input-group-btn').delegate('.save_receiver_address','click',function () {
+            $('.save_receiver_address').attr('disabled',true);
+           var receiver_name = $.trim($('#receiver_name').val());
+           var receiver_phone = $.trim($('#receiver_phone').val());
+           var receiver_pca = $.trim($('#receiver_pca').val());
+           var receiver_detailed = $.trim($('#receiver_detailed').val());
+           var order_id = $.trim($('#order_id').val());
+           if(''==receiver_name || ''==receiver_phone || ''==receiver_pca || ''==receiver_detailed){
+               layer.msg('请填写完整的收货信息',{icon:0,time:1500,shade: 0.1}, function(index){
+                   layer.close(index);
+               });
+               $('.save_receiver_address').attr('disabled',false);
+               return false;
+           }
+            if(''==order_id){
+                layer.msg('网络错误，请刷新重试',{icon:0,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                $('.save_receiver_address').attr('disabled',false);
+                return false;
+            }
+           var preg=/^[1][0-9]{10}$/;
+            if(!preg.test(receiver_phone)){
+                layer.msg('手机号码有误',{icon:0,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                $('.save_receiver_address').attr('disabled',false);
+                return false;
+            }
+            
+            $.getJSON('{:url("update_address")}',{name:receiver_name,phone:receiver_phone,pca:receiver_pca,detailed:receiver_detailed,order_id:order_id},function (response) {
+                if(response.code == '00000'){
+                    layer.msg('修改收货信息成功', {icon: 6,time:1500,shade: 0.1}, function(index){
+                        $('#receiver_name, #receiver_phone, #receiver_pca, #receiver_detailed').attr('readonly',true);
+                        $('.save_receiver_address').replaceWith('<button type="button" class="btn btn-danger change_address">修改收货地址</button>');
+                    });
+                }else{
+                    layer.msg(response.message, {icon: 6,time:1500,shade: 0.1});
+                    $('.save_receiver_address').attr('disabled',false);
+                    return false;
+                }
+            })
+        })
+    })
+
+    function delivery_update(id){
+        $.post('{:url("delivery_update")}',{id:id},function(data){           
+            if(data.code == '00000'){
+                layer.msg('发货成功',{icon:6,time:1500,shade: 0.1,});
+                window.location.reload();
+            }else{
+                layer.msg(data.message,{icon:0,time:1500,shade: 0.1,});
+                window.location.reload();
+            }                   
+        });
+        return false;
+    }
+
+
+</script>
+</body>
+</html>

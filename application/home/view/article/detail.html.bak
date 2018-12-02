@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/base.css">
+    <link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/chat.css">
+    <script src='http://tp.whjxry.net/static/home/active/js/jquery.min.js'></script>
+    <script src='http://tp.whjxry.net/static/home/active/js/clipboard.min.js'></script>
+    <title>聊吧-软文详情</title>
+</head>
+<body>
+<div class="chat-detail-container">
+    <div id="chat-detail">{$oneinfo.content}</div>
+    <button class="btn"></button>
+
+</div>
+
+<script>
+    $(document).ready(function(e) {
+        var clipboard = new Clipboard('.btn', {
+            text: function(e) {
+                return e.parentNode.children[0].innerText;
+            }
+        });
+        clipboard.on('success', function(e) {
+            alert('复制成功！可粘贴给你的微信好友/QQ好友或者发到您的微信朋友圈/QQ空间！');
+        });
+        clipboard.on('error', function(e) {
+            alert('请选择“拷贝”进行复制!');
+        });
+
+    });
+</script>
+</body>
+</html>

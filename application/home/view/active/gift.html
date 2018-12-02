@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+		<link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/base.css">
+		<link rel="stylesheet" href="http://tp.whjxry.net/static/home/active/css/style.css">
+
+		<script src="http://tp.whjxry.net/static/home/active/js/jquery.min.js"></script>
+		
+		
+		<title>赠送"{$activeres.username}"的礼物</title>
+
+		<script src="http://tpmv.whjxry.net/static/home/active/js/jweixin-1.0.0.js"></script>
+
+
+	    <script type="text/javascript">
+	       
+	        var url_tz = '<?php echo $jssdk["url"];?>';
+
+
+	        wx.config({
+	          appId: '<?php echo $jssdk["appId"];?>',
+	          timestamp: <?php echo $jssdk["timestamp"];?>,
+	          nonceStr: '<?php echo $jssdk["nonceStr"];?>',
+	          signature: '<?php echo $jssdk["signature"];?>',
+	          jsApiList: [
+	            'onMenuShareTimeline',
+	            'onMenuShareAppMessage',
+	            'onMenuShareQQ',
+	            'onMenuShareWeibo',
+	            'onMenuShareQZone'
+	          ]
+	        });
+
+	    </script>
+
+	</head>
+
+	<body style="height: 100%">
+		<div class="container" style="height: 100%">
+
+			<div class="gift" style="width: 100%;height: 100%;position: relative; -webkit-background-size: cover ;background-size: cover; background-position: center">
+
+			<div class="gift-popular">
+				<img src="http://tp.whjxry.net/static/home/active/images/tickit_icon.png" alt="" />
+				<span class="gift-name">{$activeres.username}</span>
+				<span class="gift-popular-text"><span class="popular-text">{$activeres.sentiment}</span>人气</span>
+				<a class="gift-popular-help" href="__ROOT__/home/active/rank/activeid/{$id}.html">封神榜</a>
+		    </div>
+
+				<div class="gift-box">
+					<ul id="goodsList" class="clearfix">
+						
+					</ul>
+					<div class="gift-send">
+						<div class="send-text">送出:<span><span class="renqi">0</span>人气</span>
+						</div>
+						<button type="button" id="btn-double" class="btn-double">加倍</button>
+						<span class="double">X<span class="num">1</span></span>
+						<button type="button" id="send" class="send">送出</button>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+		<input type="hidden" id="id" value="{$id}">
+		<input type="hidden" id="storeid" value="{$storeid}">
+		<input type="hidden" id="uid" value="<?php echo session('uid');?>">
+		<input type="hidden" id="code" value="{$code}">
+
+		<script type="text/javascript">
+		      var imgUrl = 'http://tp.whjxry.net/{$activeres.pic}';
+
+		      var title = '喜欢"{$activeres.username}"，就来点她吧！礼物刷刷刷！！！';
+		      wx.ready(function(){
+		        
+		          var shareData = {
+		            title: title,
+		            desc: '没有早一步，没有晚一步，于万千人海中，我们相遇。为我助攻，传递一份情，让美点亮你我的生活！',
+		            link: url_tz,
+		            imgUrl: imgUrl
+		          };
+		          wx.onMenuShareAppMessage(shareData);
+		          wx.onMenuShareTimeline(shareData);
+		          wx.onMenuShareQQ(shareData);
+		          wx.onMenuShareWeibo(shareData);
+		          wx.onMenuShareQZone(shareData);
+		      });
+      
+        </script>
+
+
+		
+
+		<script type="text/javascript">
+			var store_id={$storeid};
+			var	girl_id={$id};
+			var uid = <?php echo session('uid');?>;
+
+			
+		</script>
+		
+
+		<script type="text/javascript">
+
+
+			   var code_tp = $("#code").val();
+			   var id_tp = $("#id").val();
+			   var uid_tp = $("#uid").val();
+			   var storesid_tp = $("#storeid").val();
+
+			   if(code_tp == 0 || uid_tp == 0){
+			    window.location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx1a977e6944e78282&redirect_uri=http://tp.whjxry.net/home/active/gift/id/"+id_tp+"/storeid/"+storesid_tp+"/uid/"+uid_tp+".html&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect";
+			   }
+	    </script>
+	    <script src="http://tp.whjxry.net/static/home/active/js/base.js"></script>
+	    <script src="http://tp.whjxry.net/static/home/active/js/gift.js"></script>
+		<script src="http://tp.whjxry.net/static/home/active/js/jweixin-1.0.0.js"></script>
+	</body>
+
+</html>

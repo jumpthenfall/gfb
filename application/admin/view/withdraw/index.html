@@ -1,0 +1,295 @@
+{include file="public/header" /}
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>待审批列表</h5>
+        </div>
+        <div class="ibox-content">        
+            <div class="row">
+                <div class="col-sm-12">   
+                    <form name="admin_list_sea" class="form-search" method="post" action="{:url('before_confirm')}" id="myForm">
+                        <div class="col-md-2">
+                            <input type="text" id="key" name="key" value="{$key}" class="form-control" placeholder="输入查询ID，手机号码，查收人">
+                        </div>
+                        <div class="col-md-4">
+                            <input class="form-control layer-date" placeholder="开始时间" id="starttime" name="starttime" value="{$starttime}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+                            <input class="form-control layer-date" placeholder="结束时间" id="endtime" name="endtime" value="{$endtime}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="col-sm-5" style="line-height: 30px;">门店：</label>
+                            <div class="col-sm-6">
+                                <select class="form-control" id="store_id" name="store_id">
+                                    <option value="">==请选择==</option>
+                                    {foreach name="stores" item="vo"}
+                                        <option value="{$vo.id}"{if condition="$store_id eq $vo['id']"}selected{/if}>{$vo.storesname}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6" style="float: right;margin-bottom: 10px;margin-top: 10px;margin-right: 40px;">
+                            <button class="pull-right btn btn-success" type="button" id="dataExport"><i class="fa fa-download"></i> 导出</button>
+                            <button class="pull-right btn btn-primary" type="submit" style="margin-right: 5px;"><i class="fa fa-save"></i> 搜索</button>
+                        </div>
+                    </form> 
+                </div>
+            </div>
+            <div class="example-wrap">
+                <div class="example">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="long-tr">
+                                <th>订单号</th>
+                                <th>商品名称</th>
+                                <th>售价</th>
+                                <th>数量</th>
+                                <th>规格</th>
+                                <th>商品编号</th>
+                                <th>供应商</th>
+                                <th>订单总额</th>
+                                <th>收货人</th>
+                                <th>手机号码</th>
+                                <th>订单状态</th>
+                                <th>下单时间</th>
+                                <th>支付时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <script id="arlist" type="text/html">
+                            {{# for(var i=0;i<d.length;i++){  }}
+                            <tr class="long-td">
+                                <td>{{d[i].mo_number}}</td>
+
+                                <td colspan="6" style="padding: 0px;width: 40%">
+                                    <table class="table table-bordered table-hover" style="margin-bottom: 0px;border:0px;">
+                                    {{# for(var j=0;j<d[i].list.length;j++){  }}
+                                    <tr class="long-td">
+                                        <td style="border:0px;width: 16%"> {{d[i].list[j].goods_name}} </td>
+                                        <td style="border:0px;width: 10%"> {{d[i].list[j].goods_price}} </td>
+                                        <td style="border:0px;width: 10%"> {{d[i].list[j].mod_number}} </td>
+                                        <td style="border:0px;width: 12%">{{d[i].list[j].goods_attribute}} </td>
+                                        <td style="border:0px;width: 14%">
+                                            {{# if(d[i].list[j].sn){ }}{{d[i].list[j].sn}}
+                                            {{# }else{ }}无
+                                            {{# } }}
+                                        </td>  
+                                        <td style="border:0px;width: 14%">
+                                            {{# if(d[i].list[j].supplier_name){ }}{{d[i].list[j].supplier_name}}
+                                            {{# }else{ }}无
+                                            {{# } }}
+                                        </td>  
+                                    </tr>
+                                    {{# } }}
+                                </table>
+                                </td>
+                                <td>{{d[i].mo_pay_price}}</td>
+                                <td>
+                                    {{# if(d[i].address_name){ }}{{d[i].address_name}}
+                                    {{# }else{ }}无
+                                    {{# } }}
+                                </td>
+                                <td>
+                                    {{# if(d[i].address_phone){ }}{{d[i].address_phone}}
+                                    {{# }else{ }}无
+                                    {{# } }}
+                                </td>
+                                <td>{{d[i].status}}</td>
+                                <td>{{d[i].order_time}}</td> 
+                                <td>
+                                    {{# if(d[i].pay_time){ }}{{d[i].pay_time}}
+                                    {{# }else{ }}无
+                                    {{# } }}
+                                </td> 
+                                <td>
+                                    {{# if(d[i].mo_status ==2 || d[i].mo_status ==3 || d[i].mo_status ==4){ }}
+                                        <a href="javascript:;" onclick="update_order({{d[i].id}})" class="btn btn-danger btn-outline btn-xs">
+                                           申请退单</a>
+                                    {{# } }}
+                                    <a href="javascript:;" onclick="order_detail({{d[i].id}})" class="btn btn-primary btn-xs btn-outline">
+                                        <i class="fa fa-paste"></i> 详情</a>&nbsp;&nbsp;
+                                </td>
+                            </tr>
+                            {{# } }}
+                        </script>
+                        <tbody id="article_list"></tbody>
+                    </table>
+                    <div id="AjaxPage" style=" text-align: right;"></div>
+                    <div id="allpage" style=" text-align: right;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+</div>
+<input type="hidden" id="Nowpage" value="{$Nowpage}">
+<!-- 加载动画 -->
+<div class="spiner-example">
+    <div class="sk-spinner sk-spinner-three-bounce">
+        <div class="sk-bounce1"></div>
+        <div class="sk-bounce2"></div>
+        <div class="sk-bounce3"></div>
+    </div>
+</div>
+
+{include file="public/footer" /}
+
+<script type="text/javascript">
+    $(function(){
+        $('#myForm_report').ajaxForm({
+            beforeSubmit: checkForm, 
+            success: complete, 
+            dataType: 'json'
+        });
+
+        function checkForm(){
+            layer.load();
+        }
+
+        function complete(res){
+            if(res.code== 1 ){
+                layer.closeAll();
+                var urlxls=res.data;
+                window.location.href= urlxls;
+            }else{
+                layer.closeAll();
+                layer.msg(res.msg,{icon:0,time:1500,shade: 0.1});
+            }
+        }
+     
+    });
+
+    $(function () {
+        $("#dataExport").on("click",function(){
+            layer.load();
+            dataExport();
+        })
+
+        function dataExport(){
+            var data=$("#myForm").serialize();
+            var url = "{:url('export_list')}" + '?' + data;    
+            window.location.href = "__HTTP__" + url;
+            layer.closeAll();
+        }
+    })
+    /**
+     * [Ajaxpage laypage分页]
+     * @param {[type]} curr [当前页]
+     * @Author''
+     */ 
+    function Ajaxpage(curr){
+        if(curr){
+            $('#Nowpage').val(curr);
+        }
+        var key=$('#key').val();
+        var order_status=$('#order_status').val();
+        var starttime=$('#starttime').val();
+        var endtime=$('#endtime').val();
+        var store_id=$('#store_id').val();
+        $.getJSON('{:url("Order/index")}', {
+            page: curr || 1,key:key,order_status:order_status,starttime:starttime,endtime:endtime,store_id:store_id
+        }, function(data){      //data是后台返回过来的JSON数据
+
+            $(".spiner-example").css('display','none'); //数据加载完关闭动画           
+            if(data==''){
+                $("#article_list").html('<td colspan="20" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
+            }else{
+                article_list(data); //模板赋值
+                laypage({
+                    cont: $('#AjaxPage'),//容器。值支持id名、原生dom对象，jquery对象,
+                    pages:'{$allpage}',//总页数
+                    skip: true,//是否开启跳页
+                    skin: '#1AB5B7',//分页组件颜色
+                    curr: curr || 1,
+                    groups: 3,//连续显示分页数
+                    jump: function(obj, first){
+
+                        if(!first){
+                            Ajaxpage(obj.curr)
+                        }
+                        $('#allpage').html('第'+ obj.curr +'页，共'+ obj.pages +'页');
+                    }
+                });
+            }
+        });
+    }
+
+    Ajaxpage();
+
+    /**
+     * [article_list 接收异步获取的数据渲染到模板]
+     * @Author''
+     */
+    function article_list(list){
+
+        var tpl = document.getElementById('arlist').innerHTML;
+        laytpl(tpl).render(list, function(html){
+            document.getElementById('article_list').innerHTML = html;
+        });
+    }
+
+
+    /**
+     * [edit_ad 编辑广告]
+     * @Author''
+     */ 
+    function order_detail(id){
+        layer.open({  
+          type: 2,  
+          title: '订单详情',  
+          shadeClose: true,  
+          shade: false,  
+          maxmin: true, //开启最大化最小化按钮  
+          area: ['900px', '600px'],  
+          content: 'order_detail.html?id='+id,  
+        });  
+    }
+
+    //申请退单
+    function update_order(id){
+        layer.open({  
+            id:1,  
+            type: 1,  
+            title:' ',
+            skin:'layui-layer-rim',  
+            area:['450px', 'auto'],  
+              
+            content: ' <div class="row" style="width: 420px;  margin-left:7px; margin-top:10px;">'  
+                +'<div class="col-sm-12">'  
+                +'<div class="input-group">'  
+                +'<span class="input-group-addon">退单原因:</span>'  
+                +'<input id="reason" type="text" class="form-control">'  
+                +'</div>'  
+                +'</div>'  
+                  +'</div>'  
+            ,  
+            btn:['保存','取消'],  
+            btn1: function (index,layero) { 
+                if($("#reason").val() == ''){
+                    layer.msg('退单原因不能为空',{icon:0,time:2000,shade: 0.1});return false;
+                }
+                var reason = $("#reason").val();
+                $.getJSON("{:url('update_order')}",{reason:reason,id:id},function(res){
+                    if(res.code == '00000'){
+                        layer.msg('已提交退款申请', {icon: 6,time:1500,shade: 0.1}, function(index){
+                            $('.form-submit').attr('disabled',false);
+                        });
+                        layer.close(index);  
+                        Ajaxpage($("#Nowpage").val());
+                    }else{
+                        layer.msg(res.message, {icon: 5,time:1500,shade: 0.1});
+                        $('.form-submit').attr('disabled',false);
+                        return false; 
+                    }
+                });
+            },  
+            btn2:function (index,layero) {  
+                 layer.close(index);  
+            }  
+      
+        }); 
+    }
+
+</script>
+</body>
+</html>

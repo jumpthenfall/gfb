@@ -1,0 +1,131 @@
+{include file="public/header"/}
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <!-- 上方tab -->
+    <div class="row">
+    <div class="col-sm-4">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h4>当前资金池金额(元)</h4>
+                <a href="#question">
+                    <i class="fa fa-question" style="color:red;margin-left:10px" data-container="body" data-toggle="popover" data-placement="bottom"
+                data-content="当前资金池金额 = 资金池总额 - 已分润金额"></i>
+                </a>
+                <!--<span class="label label-success pull-right">日</span>-->
+                <!--<span class="label pull-right">周</span>-->
+                <!--<span class="label  pull-right">月</span>-->
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins">{$param.remained_bonus.col_value|number_format="4"}</h1>
+                <small></small>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h4>已分润总金额（元）</h4>
+                <a href="#question">
+                    <i class="fa fa-question" style="color:red;margin-left:10px" data-container="body" data-toggle="popover" data-placement="bottom"
+                       data-content="已分润总金额 = 用户当前总余额 + 用户总提现金额"></i>
+                </a>
+                <!--<span class="label pull-right">日</span>-->
+                <!--<span class="label pull-right">周</span>-->
+                <!--<span class="label  pull-right">月</span>-->
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins">{$param.shared_bonus.col_value|number_format="4"}</h1>
+                <small></small>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h4>资金池历史总额（元）</h4>
+                <a href="#question">
+                    <i class="fa fa-question" style="color:red;margin-left:10px" data-container="body" data-toggle="popover" data-placement="bottom"
+                       data-content="  资金池历史总额 = 当前资金金额 + 已分润资金总额"></i>
+                </a>
+                <!--<span class="label pull-right">日</span>-->
+                <!--<span class="label pull-right">周</span>-->
+                <!--<span class="label  pull-right">月</span>-->
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins">{$param.total_bonus.col_value|number_format="4"}</h1>
+                <small></small>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h4>已提现总金额（元）</h4>
+                    <a href="#question">
+                        <i class="fa fa-question" style="color:red;margin-left:10px" data-container="body" data-toggle="popover" data-placement="bottom"
+                           data-content="已提现总金额 = 成功提现的总金额"></i>
+                    </a>
+                    <!--<span class="label pull-right">日</span>-->
+                    <!--<span class="label pull-right">周</span>-->
+                    <!--<span class="label  pull-right">月</span>-->
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">{$param.withdraw_money|number_format="2"}</h1>
+                    <small></small>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h4>提现总次数</h4>
+                    <a href="#question">
+                        <i class="fa fa-question" style="color:red;margin-left:10px" data-container="body" data-toggle="popover" data-placement="bottom"
+                           data-content="  提现总次数 = 成功提现总次数"></i>
+                    </a>
+                    <!--<span class="label pull-right">日</span>-->
+                    <!--<span class="label pull-right">周</span>-->
+                    <!--<span class="label  pull-right">月</span>-->
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">{$param.withdraw_num}</h1>
+                    <small></small>
+                </div>
+            </div>
+        </div>
+
+</div>
+
+
+
+</div>
+
+{include file="public/footer" /}
+
+<script type="text/javascript">
+//    $(function () {
+//        //加载新浪天气插件
+////        $('#weather').leoweather({format:'，{时段}好！<span id="colock">现在时间是：<strong>{年}年{月}月{日}日 星期{周} {时}:{分}:{秒}</strong>，</span> <b>{城市}天气</b> {天气} {夜间气温}℃ ~ {白天气温}℃'});
+//        var myDate = new Date();
+//        var year = myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+//        var month = myDate.getMonth() + 1;       //获取当前月份(0-11,0代表1月)
+//        var day = myDate.getDate() -1 ;
+//        var stime = year + '-' + month + '-' + day + " 00:00:00";
+//        var etime =  year + '-' + month + '-' + day + " 23:59:59";
+//        //点击昨日订单跳转
+//        $('#total_order_link').click(function () {
+//            location.href = "/admin/mall_order/index?starttime=" + stime + "&endtime="+ etime;
+//        })
+//        //跳待发货订单
+//        $('#order_unfinished_link').click(function () {
+//            location.href = "{:url('/admin/mall_order/index',['order_status'=>2])}";
+//        })
+//    })
+
+</script>
+
+</body>
+</html>

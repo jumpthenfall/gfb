@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<title>我的优惠券</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="/static/assets/css/mui.min.css" />
+		<link rel="stylesheet" type="text/css" href="/static/assets/css/style.css" />
+	</head>
+
+	<body>
+
+		<div class="mui-content mui-scroll-wrapper">
+			<div class="mui-scroll">
+				<div class="my-coupons">
+					<div class="coupons-content {if $couponinfo['wc_type'] == 3}used{/if}">
+						<div class="deductible">
+							<span class="cur-price">100</span>
+							<span class="di-kou">抵扣</span>
+							<span class="dikou-price">1000</span>
+						</div>
+						<div class="explain"><i class="line-bg"></i><span>原价1000元/20瓶啤酒现在只需100元</span><i class="line-bg"></i></div>
+						<div class="discount-code">
+							<h2>优惠码：<span class="code-number">{$couponinfo['wc_code']}</span></h2>
+						</div>
+						<div class="labe">{if $couponinfo['wc_type'] == 2}把优惠码报给收银员核销即可{else}您已使用此优惠券！{/if}</div>
+						<div class="instructions">
+							<h4>使用说明：</h4>
+							<p>①.消费只限雪花勇闯啤酒</p>
+							<p>②.只限适用门店使用</p>
+							<p>③.有效时间：一个月有效期</p>
+							<p>④.活动最终解释权归长久国际俱乐部所有</p>
+						</div>
+						<div class="coupons-status">
+							{if $couponinfo['wc_type'] == 2}
+							<img src="/static/assets/images/yilingqu.png" />
+							{else}
+							<img src="/static/assets/images/yilingqu.png" />
+							{/if}
+							<!--<img src="/static/assets/images/yishiyong.png"/>-->
+						</div>
+					</div>
+					<div class="coupons-content-footer">
+						<h2>适用门店</h2>
+						<div class="suit-store">
+							<ul class="mui-table-view">
+								<li class="mui-table-view-cell mui-media">
+									<img class="mui-media-object mui-pull-left" src="/static/assets/images/store_image2.png">
+									<div class="mui-media-body">
+										<h3><span id="IpAddress" class="mui-pull-right navigation">使用导航</span>长久国际俱乐部</h3>
+										<p class="contact-seller mui-ellipsis"><span class="seller-tel">15342358059</span>
+											<a href="tel:15342358059" class="mui-btn mui-btn-default btn-tel">拨号咨询</a>
+										</p>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="/static/assets/js/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/assets/js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/assets/js/jweixin-1.2.0.js" type="text/javascript"></script>
+		<!--<script src="http://www.whhykj.cn/hykjway//api/weixin/wxconfig" type="text/javascript"></script>-->
+		<script src="/static/assets/js/base.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+
+            //微信配置
+            wx.config({
+                debug:false,
+                appId:'<?php echo $wxconfig["appId"];?>',
+                timestamp:'<?php echo $wxconfig["timestamp"];?>',
+                nonceStr:'<?php echo $wxconfig["noncestr"];?>',
+                signature: '<?php echo $wxconfig["signature"];?>',
+                jsApiList:['nMenuShareTimeline', 'onMenuShareAppMessage', 'nMenuShareQQ', 'onMenuShareWeibo','openLocation', 'nMenuShareQZone', 'startRecord', 'topRecord', 'onVoiceRecordEnd', 'layVoice', 'pauseVoice', 'topVoice', 'onVoicePlayEnd', 'ploadVoice', 'downloadVoice', 'hooseImage', 'previewImage', 'ploadImage', 'downloadImage', 'ranslateVoice', 'getNetworkType', 'penLocation', 'getLocation', 'ideOptionMenu', 'showOptionMenu', 'ideMenuItems', 'showMenuItems', 'ideAllNonBaseMenuItem', 'showAllNonBaseMenuItem', 'loseWindow', 'scanQRCode', 'hooseWXPay', 'openProductSpecificView', 'ddCard', 'chooseCard', 'penCard']}
+            );
+			var MyCoupons = {
+				status: getQueryString('type'),
+				code: getQueryString('code'),
+				init: function() {
+					mui('.mui-scroll-wrapper').scroll();
+//					MyCoupons.showMyCoupons();
+
+					$('#IpAddress').on('tap', function() {
+						wx.openLocation({
+							latitude: 30.580020,
+							longitude: 114.265060,
+							name: '长久国际俱乐部',
+							address: '湖北省武汉市硚口区解放大道1127号',
+							scale: 14,
+							infoUrl: 'http://weixin.qq.com'
+						});
+					})
+				},
+//				showMyCoupons: function() {
+//					$('.code-number').text(MyCoupons.code);
+//					if(MyCoupons.status == 2) {
+//						$('.coupons-content').removeClass('used');
+//						$('.labe').text('把优惠码报给收银员核销即可');
+//						$('.coupons-status').html('<img src="/static/assets/images/yilingqu.png" />');
+//					} else if(MyCoupons.status == 3) {
+//						$('.coupons-content').addClass('used');
+//						$('.labe').text('您已使用此优惠券！');
+//						$('.coupons-status').html('<img src="/static/assets/images/yishiyong.png" />');
+//					}
+//				}
+			};
+
+			$(function() {
+				MyCoupons.init();
+			});
+		</script>
+	</body>
+
+</html>

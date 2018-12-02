@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<title>5元畅饮</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="/static/assets/css/mui.min.css" />
+		<link rel="stylesheet" type="text/css" href="/static/assets/css/style.css" />
+	</head>
+
+	<body class="coupons-index">
+
+		<div class="mui-content mui-scroll-wrapper">
+			<div class="mui-scroll">
+				<div class="coupons activity-a">
+					<div class="activity-explain">
+						<h2>活动说明：</h2>
+						<p>①.消费只限雪花勇闯啤酒</p>
+						<p>②.只限适用门店使用</p>
+						<p>③.有效时间：一个月有效期</p>
+						<p>④.活动最终解释权归长久国际俱乐部所有</p>
+					</div>
+					<div class="card">
+						<div class="card-header">
+							<span class="header-bg bg-l"></span>
+							<span class="header-title">适用门店</span>
+							<span class="header-bg bg-r"></span>
+						</div>
+						<div class="card-body">
+							<ul class="mui-table-view store-list">
+								<li class="mui-table-view-cell store-list-item">
+									<div class="mui-row">
+										<div class="mui-pull-left seller-banner"><img src="/static/assets/images/store_image2.png" /></div>
+										<div class="mui-pull-left seller-info">
+											<h2 class="seller-name">长久国际俱乐部</h2>
+											<h3 class="seller-tel"><a href="tel:15342358059">15342358059</a></h3>
+										</div>
+									</div>
+
+									<div class="seller-address">
+										<div class="mui-row">
+											<div class="mui-col-xs-8">地址：湖北省武汉市硚口区解放大道1127号</div>
+											<div class="mui-col-xs-4"><span id="IpAddress" class="ip-address">使用导航</span></div>
+										</div>
+
+									</div>
+								</li>
+								<li class="mui-table-view-cell store-list-item">
+									<div class="mui-row">
+										<div class="mui-pull-left seller-banner"><img src="/static/assets/images/store_image3.jpg" /></div>
+										<div class="mui-pull-left seller-info">
+											<h2 class="seller-name">法老王国际俱乐部</h2>
+											<h3 class="seller-tel"><a href="tel:15342358059">15342358059</a></h3>
+										</div>
+									</div>
+
+									<div class="seller-address">
+										<div class="mui-row">
+											<div class="mui-col-xs-8">地址：湖北省武汉市硚口区解放大道1127号</div>
+											<div class="mui-col-xs-4"><span id="IpAddress" class="ip-address">使用导航</span></div>
+										</div>
+
+									</div>
+								</li>
+							</ul>
+						</div>
+						<div class="card-footer">
+							<button type="button" class="mui-btn mui-btn-default mui-btn-block btn-get-coupon">下单付款</button>
+						</div>
+						<input type='hidden' id="coupon_status" value="">
+						<input type='hidden' id="coupon_code" value="">
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="/static/assets/js/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/assets/js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/assets/js/jweixin-1.2.0.js" type="text/javascript"></script>
+		<script src="/static/assets/js/base.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			//微信配置
+
+			var Coupons = {
+				type: "",
+				init: function() {
+					mui('.mui-scroll-wrapper').scroll();
+					$('.btn-get-coupon').on('tap', function() {
+						if(Coupons.type == 1) {
+							Coupons.goToWxPay();
+						} else if(Coupons.type == 2) {
+							mui.alert('您已支付，快去会用吧！');
+						} else if(Coupons.type == 3) {
+							mui.alert('您已使用，请关注其他活动！');
+						}
+					});
+
+					$('#IpAddress').on('tap', function() {
+						wx.openLocation({
+							latitude: 30.580020,
+							longitude: 114.265060,
+							name: '长久国际俱乐部',
+							address: '湖北省武汉市硚口区解放大道1127号',
+							scale: 14,
+							infoUrl: ''
+						});
+					});
+				},
+				goToWxPay: function() {
+					var data = {
+						totalFee: 60
+					};
+					$.ajax({
+						type: 'post',
+						url: '/home/coupon/webPay?openid=' + '&t=' + Math.random(),
+						data: data,
+						success: function(d) {
+							if(d.code == 0) {
+								var result = d.data;
+								wx.chooseWXPay({
+									timestamp: result.timeStamp,
+									nonceStr: result.nonceStr,
+									package: result.package,
+									signType: result.signType,
+									paySign: result.paySign,
+									success: function(res) {
+										// 支付成功后的回调函数
+										mui.alert('支付成功');
+										location.href = '/home/coupon/Couponsindex.html';
+									},
+									fail: function(res) {
+										//支付失败
+										mui.alert(res.errmsg);
+									},
+									cancel: function(res) {
+										//支付取消
+										mui.alert('已取消支付')
+									}
+								});
+							} else {
+								mui.toast(d.msg)
+							}
+						},
+						error: function(d) {
+							mui.toast('网络故障，请重试！');
+						}
+					});
+				}
+			};
+
+			$(function() {
+				Coupons.init();
+			});
+		</script>
+	</body>
+
+</html>
