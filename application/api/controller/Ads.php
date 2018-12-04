@@ -70,11 +70,11 @@ class Ads extends Base
     public function get_profit()
     {
         try{
+            $log = '/data/wwwroot/guafenbao/application/shell/profit.log';
             $hour = date('H');
             if ($hour < 8 || $hour > 19) {
                 throw Exception('广告时间为8:00~20:00',50001);
             }
-            $log = '/data/wwwroot/guafenbao/application/shell/profit.log';
             $id = input('id/d');
             if(!$id){
                 throw Exception('参数缺失',10001);
