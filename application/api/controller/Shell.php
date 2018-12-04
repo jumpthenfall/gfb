@@ -37,17 +37,22 @@ class Shell extends Base
                 $money = $redis->get($l);
                 $total_money = bcadd($total_money,$money,4);
                 $id = substr($l,strrpos($l,'_')+1);
+                $number = $redis->get('card_account_number_'.$id);
+                if(!$number || $number == 'nil') continue;
                 $insert[] = [
                     'money'=>$money,
-                    'number'=>$redis->get('card_account_number_'.$id),
+                    'number'=>$number,
                     'date'=>$date,
                     'card_id'=>$id
                 ];
                 $account = $account_model->getCardAccountInfoByCardId($id);
+                if(!$account){
+                    continue;
+                }
                 $flow[] = [
                     'card_id'=>$id,
                     'money'=>$money,
-                    'balance'=>bcadd($money,$account['balance'],4),
+                    'balance'=>$account['balance'],
                     'add_time'=>$date . ' 20:00:00',
                     'remark'=>'日收益记录'
                 ];
@@ -66,8 +71,22 @@ class Shell extends Base
             Db::name('card_account_flow')->insertAll($flow);//增加用户资金流水
             Db::name('card_config')->where('col_name','=','remained_bonus')->setDec('col_value',(int)$total_money);
             Db::name('card_config')->where('col_name','=','shared_bonus')->setInc('col_value',(int)$total_money);
+            $this->redis_clear();
         }catch (Exception $e){
-//            dump($e->getMessage());
+            dump($e->getMessage());
+        }
+    }
+
+    public function redis_clear()
+    {
+        $redis = new Redis();
+        $number_list = $redis->keys('card_account_number_*');
+        foreach ($number_list as $number){
+            $redis->rm($number);
+        }
+        $money_list = $redis->keys('card_account_money_*');
+        foreach ($money_list as $money){
+            $redis->rm($money);
         }
     }
 }

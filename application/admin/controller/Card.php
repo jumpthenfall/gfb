@@ -115,12 +115,13 @@ class Card extends Base
             }
             $model = new CardModel();
             $status = $model->where('id','=',$id)->value('status');
+            $time_length = $model->where('id','=',$id)->value('time_length');
             if(4!=$status){
                 throw Exception('卡状态异常',50001);
             }
             $up['status'] = 1;
             $up['start_time'] = date('Y-m-d H:i:s');
-            $up['end_time'] = date('Y-m-d H:i:s',strtotime('+ 3months'));
+            $up['end_time'] = date('Y-m-d H:i:s',strtotime("+ {$time_length}months"));
             $status = $model->where('id','=',$id)->update($up);
             if(!$status){
                 throw exception('激活失败',50001);
@@ -209,9 +210,12 @@ class Card extends Base
         $param['endtime'] = input('endtime');
         $param['page'] = input('page',1) ;
         $param['limit'] = config('list_rows');
-        $param['status'] = input('status',1);
-        $param['agent_id'] = input('agent_id');
-        $where['c.status'] = $param['status'];
+        $param['status'] = input('status');
+        $param['agent_id'] =session('groupid')!=1 ? session('uid') : input('agent_id');
+        $where=[];
+        if($param['status']){
+            $where['c.status'] = $param['status'];
+        }
         if($param['key']) {
             $where['c.card_number'] = ['like','%'.$param['key'] .'%'];
         }
@@ -221,18 +225,20 @@ class Card extends Base
             $where['c.agent_id'] = ['NOT NULL',''];
         }
         if($param['starttime']&&$param['endtime']){
-            $where['c.start_time'] = ['between',[$param['starttime'],$param['endtime']]];
+            $where['c.add_time'] = ['between',[$param['starttime'],$param['endtime']]];
         }elseif($param['starttime']){
-            $where['c.start_time'] = ['>',$param['starttime']];
+            $where['c.add_time'] = ['>',$param['starttime']];
         }elseif ($param['endtime']){
-            $where['c.start_time'] = ['<',$param['endtime']];
+            $where['c.add_time'] = ['<',$param['endtime']];
         }
+        $model= new CardModel();
         $model= new CardModel();
         $list = $model->getExportList($where);
         $stmts  = $list;
         $stmt = [];
         foreach ($stmts as $k => $v) {
             $stmt[$k]['card_number'] = $v['card_number'];
+            $stmt[$k]['earning_peak'] = $v['earning_peak'];
             $stmt[$k]['start_time'] = $v['start_time'];
             $stmt[$k]['end_time'] = $v['end_time'];
             $stmt[$k]['total_money'] = $v['total_money'];
@@ -248,7 +254,7 @@ class Card extends Base
         $fp = fopen('php://output', 'a');
         
         // 输出Excel列名信息
-        $head = array('卡号', '激活时间', '过期时间', '总收益金额', '可用余额', '提现金额', '提现次数', '总分润次数','代理商','状态');
+        $head = array('卡号','每日最大收益', '激活时间', '过期时间', '总收益金额', '可用余额', '提现金额', '提现次数', '总分润次数','代理商','状态');
         foreach ($head as $i => $v) {
             $encode = mb_detect_encoding($v, array("ASCII","UTF-8","GB2312","GBK","BIG5"));
             // CSV的Excel支持GBK编码，一定要转换，否则乱码
@@ -623,7 +629,7 @@ class Card extends Base
     }
 	
 	 /**
-     * 导出已分（已售）发卡
+     * 导出卡生成记录
      */
     public function export_card_record(){
         set_time_limit(0);
@@ -643,7 +649,7 @@ class Card extends Base
 		
       
         //$param['agent_id'] = $card_record_res['agent_id'];
-        $where['c.status'] = 1;
+//        $where['c.status'] = 1;
         if($param['marke']) {
             $where['c.recordMark'] = $param['marke'];
         }

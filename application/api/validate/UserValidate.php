@@ -8,7 +8,7 @@ class UserValidate extends Validate
 {
     protected $rule = [
         ['mobile|手机号', 'require|number|length:11'],
-        ['ali_account|支付宝账号', 'require|length:4,15'],
+        ['ali_account|支付宝账号', 'require|length:4,64'],
         ['ali_nickname|支付宝用户名', 'require|length:1,32'],
         ['content|反馈内容', 'require|length:1,300'],
         ['card_id|登录卡ID', 'require|number'],

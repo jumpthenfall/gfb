@@ -18,7 +18,7 @@ class CardModel extends Model
     public function getCardInfo($where)
     {
          $res = $this
-             ->field('id,user_id,card_number,password,IFNULL(start_time,"") start_time,phone_brand,IFNULL(end_time,"") end_time,phone_version,phone_mac,status')
+             ->field('id,user_id,card_number,password,IFNULL(start_time,"") start_time,phone_brand,IFNULL(end_time,"") end_time,phone_version,phone_mac,status,time_length')
              ->where($where)->find();
          return $res ? $res : array();
 
@@ -32,7 +32,7 @@ class CardModel extends Model
     public function  getCardInfoByPK($id)
     {
         $res = $this
-            ->field('id,user_id,card_number,password,earning_peak,start_time,end_time,phone_version,phone_brand,phone_mac')
+            ->field('id,user_id,card_number,password,earning_peak,start_time,end_time,phone_version,phone_brand,phone_mac,time_length')
             ->where(['id'=>$id])->find();
         return $res ? $res : array();
     }

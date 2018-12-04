@@ -73,13 +73,21 @@ class Login extends Base
                 if(3 == $card_info['status']){
                     throw Exception('该卡已过期',40001);
                 }
-                if(4 == $card_info['status']){
-                    throw Exception('该卡未激活，请联系管理员',40001);
+                if(4 == $card_info['status']){//未激活卡登录激活开始算有效期
+                    $up['end_time'] = date('Y-m-d H:i:s',strtotime("+ {$card_info['time_length']}month"));
+                    $up['start_time'] = date('Y-m-d H:i:s');
+                    $up['status'] = 1;
+                    $up_res = $card_model->where('id','=',$card_info['id'])->update($up);
+                    if(!$up_res){
+                        throw Exception('该卡未激活，请联系管理员',40001);
+                    }
+                    $card_info['start_time'] = $up['start_time'];
+                    $card_info['end_time'] = $up['end_time'];
                 }
                 if(!$card_info['phone_mac']){
                     $card_model->where('id','=',$card_info['id'])->update(['phone_mac'=>$param['phone_mac']]);
                 }elseif ($param['phone_mac'] != $card_info['phone_mac']){
-                    throw Exception('不支持多设备登录',40001);
+//                    throw Exception('不支持多设备登录',40001);
                 }
                 if(!$card_info['user_id']){
                     $card_info['need_info']=1;
@@ -90,6 +98,7 @@ class Login extends Base
 
             }
             unset($card_info['password']);
+            unset($card_info['time_length']);
             $this->createToken(['id'=>$card_info['id']]);
             $this->setData($card_info);
             $this->setToken();

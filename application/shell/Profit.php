@@ -59,7 +59,6 @@ class Profit
                 $this->redis->lPush($this->list_key,$data);
                 throw new Exception('更新失败',50002);
             }
-            echo $data .PHP_EOL;
 //            $redis = new Redis();
             if($up_res == 1){
                 if($this->redis->has('card_account_money_'.$item['id']) &&$this->redis->has('card_account_number_'.$item['id'])){

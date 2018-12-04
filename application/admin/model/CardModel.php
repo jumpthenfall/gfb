@@ -73,13 +73,14 @@ class CardModel extends Model
     {
         $res =  $this->alias('c')
             ->field('
-            c.id,c.card_number,c.password,c.add_time,ca.total_money,IFNULL(c.start_time,"未激活") start_time,c.status,
-            ca.balance,IFNULL(c.end_time,"未激活") end_time,ca.withdraw_money,ca.withdraw_num,ca.total_num,IFNULL(a.username,"") agent_name,
+            c.id,c.card_number,c.password,c.earning_peak,c.add_time,ca.total_money,IFNULL(c.start_time,"未激活") start_time,c.status,
+            ca.balance,IFNULL(c.end_time,"未激活") end_time,ca.withdraw_money,ca.withdraw_num,ca.total_num,IFNULL(a.real_name,"") agent_name,
             (CASE c.status WHEN 1 THEN "已激活" WHEN 2 THEN "已禁用" WHEN 3 THEN "已过期" WHEN 4 THEN "未激活" ELSE "状态异常" END) statusRemark
             ')
             ->join('tp_card_account ca','c.id = ca.card_id','left')
             ->join('tp_admin a','c.agent_id = a.id','left')
             ->where($where)
+            ->order('c.id','desc')
             ->select();
         return $res;
     }
@@ -93,7 +94,7 @@ class CardModel extends Model
     {
         $res =  $this->alias('c')
             ->field('
-            c.id,c.recordMark,c.card_number,c.password,c.start_time,c.end_time,c.earning_peak,c.add_time,IFNULL(c.start_time,"未激活") start_time,
+            c.id,c.recordMark,c.card_number,c.password,c.start_time,IFNULL(c.end_time,"未激活") end_time,c.earning_peak,c.add_time,IFNULL(c.start_time,"未激活") start_time,
             (CASE c.status WHEN 1 THEN "已激活" WHEN 2 THEN "已禁用" WHEN 3 THEN "已过期" WHEN 4 THEN "未激活" ELSE "状态异常" END) status
             ')
             ->where($where)

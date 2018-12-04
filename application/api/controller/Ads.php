@@ -71,9 +71,10 @@ class Ads extends Base
     {
         try{
             $hour = date('H');
-            if($hour<8 || $hour>19){
+            if ($hour < 8 || $hour > 19) {
                 throw Exception('广告时间为8:00~20:00',50001);
             }
+            $log = '/data/wwwroot/guafenbao/application/shell/profit.log';
             $id = input('id/d');
             if(!$id){
                 throw Exception('参数缺失',10001);
@@ -82,16 +83,17 @@ class Ads extends Base
             if(!$card_info = $card_model->getCardInfoByPK($id)){
                 throw Exception('卡信息错误',50002);
             }
-            $max = bcmul(bcdiv($card_info['earning_peak'],3600,4),10000);//最大随机数
-            $min = bcmul(bcdiv($card_info['earning_peak']-5,3600,4),10000);//最小随机数
+            $max = bcmul(bcdiv($card_info['earning_peak'],3400,4),10000);//最大随机数
+            $min = bcmul(bcdiv($card_info['earning_peak'] - 1,3400,4),10000);//最小随机数
             $money = bcdiv(mt_rand($min,$max),10000,4);
-            if(!1){
+            if (!1) {
 
             }else{
                 $redis = new Redis();
-                if($redis->get('card_account_number_' .$id) <  3600 && $redis->get('card_profit_timestamp') < time()-10){
-                    $redis->lPush('card_profit_list',serialize(['id'=>$id,'money'=>$money]));
-                    $redis->set('card_profit_timestamp',time());
+                if($redis->get('card_account_number_' . $id) < 3600 && $redis->get('card_profit_timestamp_' . $id) < time() - 10){
+                    $push = $redis->lPush('card_profit_list',serialize(['id'=>$id,'money'=>$money]));
+//                    file_put_contents($log,$push .PHP_EOL,FILE_APPEND);
+                    $redis->set('card_profit_timestamp_'.$id,time());
                 }
             }
 //            $account_model = new CardAccountModel();
@@ -119,6 +121,7 @@ class Ads extends Base
 
             $this->setData(['money'=>$money]);
         }catch (Exception $e){
+            file_put_contents($log,$e->getMessage() .PHP_EOL,FILE_APPEND);
             $this->setData(['money'=>0]);
             $this->setMsg($e->getMessage());
             $this->setCode($e->getCode());
