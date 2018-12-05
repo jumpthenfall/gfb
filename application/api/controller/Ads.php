@@ -70,10 +70,10 @@ class Ads extends Base
     public function get_profit()
     {
         try{
-            $log = '/data/wwwroot/guafenbao/application/shell/profit.log';
+            $log = '../application/shell/profit.log';
             $hour = date('H');
             if ($hour < 8 || $hour > 19) {
-                throw Exception('广告时间为8:00~20:00',50001);
+//                throw Exception('广告时间为8:00~20:00',50001);
             }
             $id = input('id/d');
             if(!$id){
@@ -90,10 +90,10 @@ class Ads extends Base
 
             }else{
                 $redis = new Redis();
-                if($redis->get('card_account_number_' . $id) < 3600 && $redis->get('card_profit_timestamp_' . $id) < time() - 10){
+                if($redis->get('card_account_number_' . $id) < 3600 && $redis->hGet('card_temp_data_' .$id,'profit_time') < time() - 10){
                     $push = $redis->lPush('card_profit_list',serialize(['id'=>$id,'money'=>$money]));
 //                    file_put_contents($log,$push .PHP_EOL,FILE_APPEND);
-                    $redis->set('card_profit_timestamp_'.$id,time());
+                    $redis->hSet('card_temp_data_'.$id,'profit_time',time());
                 }
             }
 //            $account_model = new CardAccountModel();

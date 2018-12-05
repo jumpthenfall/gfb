@@ -5,6 +5,7 @@ use app\api\model\CardModel;
 
 use app\api\model\UserModel;
 use app\api\validate\LoginValidate;
+use think\cache\driver\Redis;
 use think\Controller;
 use think\Db;
 use think\Exception;
@@ -97,9 +98,16 @@ class Login extends Base
                 }
 
             }
+            $user_info =  $card_model->getUserInfoByCardId($card_info['id']);
+            $card_info['ali_nickname'] = $user_info['ali_nickname'] ? $user_info['ali_nickname'] : '' ;
+            $card_info['ali_account'] = $user_info['ali_account'] ? $user_info['ali_account'] : '' ;
             unset($card_info['password']);
             unset($card_info['time_length']);
-            $this->createToken(['id'=>$card_info['id']]);
+            $login_time = time();
+            Db::name('card_login_log')->insertGetId(['card_id'=>$card_info['id'],'phone_mac'=>$param['phone_mac'],'login_time'=>$login_time]);
+            $redis = new Redis();
+            $redis->hSet('card_temp_data_' . $card_info['id'],'login_time',$login_time);
+            $this->createToken(['id'=>$card_info['id'],'iat'=>$login_time]);
             $this->setData($card_info);
             $this->setToken();
         }catch (Exception $e){

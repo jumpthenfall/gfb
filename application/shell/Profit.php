@@ -40,8 +40,8 @@ class Profit
 //        $redis = new Redis();
         try{
 //            $list_key = 'card_profit_list';
-            $redis = new Redis();
-            $data = $redis->rpop($this->list_key);
+//            $redis = new Redis();
+            $data = $this->redis->rpop($this->list_key);
             if(!$data){
                 return ;
             }
@@ -80,9 +80,9 @@ class Profit
 
 
 $shell = new Profit();
-$redis = new Redis();
+//$redis = new Redis();
 while (true){
-    if(!$redis->lLen($shell->list_key)){
+    if(!$shell->redis->lLen($shell->list_key)){
         echo date('Y-m-d H:i:s') .PHP_EOL;
         sleep(1) ;
     }

@@ -1,6 +1,7 @@
 <?php
 
 namespace app\api\controller;
+use think\cache\driver\Redis;
 use think\Controller;
 use JWT\JWT;
 use think\Exception;
@@ -21,16 +22,13 @@ class Base extends Controller
     public  $jwt_base_token = ''; //jwt token 字符串
     public  $jwt_key = ''; //jwt 加密字符串
     public  $jwt_alg = ''; // jwt 加密算法
-    public  $jwt_admin_id = '';//管理员id
-    public  $jwt_role_id = '';//角色id
-    public  $jwt_staff_id = '';//员工ID
-    public  $jwt_staff_role = '';//员工ID
-    public  $jwt_stores_id = '';//门店ID
-    public  $jwt_uid = '';//会员ID
+    public  $jwt_card_id = '';//卡id
+    public  $jwt_iat = '';//会员ID
+    public  $redis;
     public  $return_data = ['code'=>200,'result'=>null,'message'=>'成功'];
     public function _initialize()
     {
-
+        $this->redis = new Redis();
         $this->jwt_key = config('jwt_token.jwt_key');
         $this->jwt_alg = config('jwt_token.jwt_alg');
         $config = load_config();
@@ -45,6 +43,8 @@ class Base extends Controller
             header('Content-Type:application/json; charset=utf-8');
             exit(json_encode($res));
         }
+
+        $this->checkLoginPhone();//检测token生成时间与最后一直登录时间是否一致，不一致则认为该token无效
        
        config($config);
 //       if(config('web_site_close') == 2 && $this->jwt_admin_id != 1){
@@ -159,12 +159,8 @@ class Base extends Controller
      */
     public function setParam()
     {
-        $this->jwt_admin_id = isset($this->jwt_base_playload['admin_id']) ? $this->jwt_base_playload['admin_id'] : '';
-        $this->jwt_role_id = isset($this->jwt_base_playload['role_id']) ? $this->jwt_base_playload['role_id'] : '';
-        $this->jwt_staff_id = isset($this->jwt_base_playload['staff_id']) ? $this->jwt_base_playload['staff_id'] : '';
-        $this->jwt_staff_role = isset($this->jwt_base_playload['staff_role']) ? $this->jwt_base_playload['staff_role'] : '';
-        $this->jwt_stores_id = isset($this->jwt_base_playload['stores_id']) ? $this->jwt_base_playload['stores_id'] : '';
-        $this->jwt_uid = isset($this->jwt_base_playload['uid']) ? $this->jwt_base_playload['uid'] : '';
+        $this->jwt_card_id = isset($this->jwt_base_playload['id']) ? $this->jwt_base_playload['id'] : '';
+        $this->jwt_iat = isset($this->jwt_base_playload['iat']) ? $this->jwt_base_playload['iat'] : '';
     }
 
     /**
@@ -200,6 +196,17 @@ class Base extends Controller
     {
         if(!$this->jwt_stores_id){
             throw new Exception('登录状态错误，请重新登录','21818');
+        }
+    }
+
+    /**
+     * 判断token生成时间与最后一次登录时间是否相同，如果不同则认为该token无效
+     */
+    public function checkLoginPhone()
+    {
+        if($this->jwt_iat != $this->redis->hGet('card_temp_data_'.$this->jwt_card_id,'login_time')){
+            header('Content-Type:application/json; charset=utf-8');
+            exit(json_encode(['code'=>21818,'result'=>null,'message'=>'该卡在其他设备登录，请重新登录']));
         }
     }
 

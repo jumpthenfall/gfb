@@ -11,7 +11,7 @@ return [
         'playload'=>[
             'iss'=>'https://www.gfb.cn',// jwt签发者
             'aud'=>'https://www.gfb.cn',// 接收jwt的一方
-            'iat'=> time(),// jwt的签发时间
+//            'iat'=> time(),// jwt的签发时间
         ]
     ],
     //不需要登录验证的接口
