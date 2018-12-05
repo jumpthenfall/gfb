@@ -19,5 +19,6 @@ return [
         'index/index',//首页
         'login/login',//登录接口
         'admin_login',//管理员登录接口
+        'shell/manage_daily_data',//脚本
     ],
 ];

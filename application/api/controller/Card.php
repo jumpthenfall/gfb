@@ -119,9 +119,9 @@ class Card extends Base
             if(!$card_info){
                 throw Exception('查询资金信息失败',40001);
             }
-            $redis = new Redis();
+//            $this->redis = new Redis();
             $card_info['allowed_money'] = bcmul(bcdiv($card_info['balance'],100),100);
-            $card_info['today_profit'] = $redis->has('card_account_money_'.$id) ? $redis->get('card_account_money_'.$id) : 0;
+            $card_info['today_profit'] = $this->redis->has('card_account_money_'.$id) ? $this->redis->get('card_account_money_'.$id) : 0;
             $this->setData($card_info);
         }catch (Exception $e){
             $this->setMsg($e->getMessage());
@@ -270,9 +270,9 @@ class Card extends Base
             if(!$card_model->card_exist($id)){
                 throw Exception('卡信息错误',40001);
             }
-            $redis = new Redis();
-            $data['today']['money'] = $redis->has('card_account_money_'.$id) ? $redis->get('card_account_money_'.$id) : '0.0000';
-            $data['today']['number'] = $redis->has('card_account_number_'.$id) ? $redis->get('card_account_number_'.$id) : 0;
+//            $this->redis = new Redis();
+            $data['today']['money'] = $this->redis->has('card_account_money_'.$id) ? $this->redis->get('card_account_money_'.$id) : '0.0000';
+            $data['today']['number'] = $this->redis->has('card_account_number_'.$id) ? $this->redis->get('card_account_number_'.$id) : 0;
             $y_time = date('Y-m-d',strtotime('- 1day'));
             $y_data = Db::name('card_daily_data')->where(['card_id'=>$id,'date'=>$y_time])->find();
             $data['yesterday']['money'] = $y_data ? $y_data['money'] : '0.0000';

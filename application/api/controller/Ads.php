@@ -31,16 +31,16 @@ class Ads extends Base
     public function ads_list()
     {
         try{
-            $redis = new Redis();
+//            $redis = new Redis();
             $cols = ['add_time','id','title','status','modified_time'];
             $order_col = $cols[mt_rand(0,4)];
             $order_type = time()%2 ? 'asc' : 'desc';
-            if($redis->has('ads_'.$order_col.$order_type)){
-                $ads_list = json_decode($redis->get('ads_'.$order_col.$order_type),1);
+            if($this->redis->has('ads_'.$order_col.$order_type)){
+                $ads_list = json_decode($this->redis->get('ads_'.$order_col.$order_type),1);
             }else{
                 $ads_model = new AdsModel();
                 $ads_list = $ads_model->getAdsList([],$order_col,$order_type);
-                $redis->set('ads_'.$order_col.$order_type,json_encode($ads_list));
+                $this->redis->set('ads_'.$order_col.$order_type,json_encode($ads_list));
             }
             $this->setData(['list'=>$ads_list]);
         }catch (Exception $e){
@@ -73,7 +73,7 @@ class Ads extends Base
             $log = '../application/shell/profit.log';
             $hour = date('H');
             if ($hour < 8 || $hour > 19) {
-//                throw Exception('广告时间为8:00~20:00',50001);
+                throw Exception('广告时间为8:00~20:00',50001);
             }
             $id = input('id/d');
             if(!$id){
@@ -89,11 +89,11 @@ class Ads extends Base
             if (!1) {
 
             }else{
-                $redis = new Redis();
-                if($redis->get('card_account_number_' . $id) < 3600 && $redis->hGet('card_temp_data_' .$id,'profit_time') < time() - 10){
-                    $push = $redis->lPush('card_profit_list',serialize(['id'=>$id,'money'=>$money]));
+//                $redis = new Redis();
+                if($this->redis->get('card_account_number_' . $id) < 3600 && $this->redis->hGet('card_temp_data_' .$id,'profit_time') < time() - 10){
+                    $push = $this->redis->lPush('card_profit_list',serialize(['id'=>$id,'money'=>$money]));
 //                    file_put_contents($log,$push .PHP_EOL,FILE_APPEND);
-                    $redis->hSet('card_temp_data_'.$id,'profit_time',time());
+                    $this->redis->hSet('card_temp_data_'.$id,'profit_time',time());
                 }
             }
 //            $account_model = new CardAccountModel();

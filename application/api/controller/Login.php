@@ -105,8 +105,8 @@ class Login extends Base
             unset($card_info['time_length']);
             $login_time = time();
             Db::name('card_login_log')->insertGetId(['card_id'=>$card_info['id'],'phone_mac'=>$param['phone_mac'],'login_time'=>$login_time]);
-            $redis = new Redis();
-            $redis->hSet('card_temp_data_' . $card_info['id'],'login_time',$login_time);
+//            $redis = new Redis();
+            $this->redis->hSet('card_temp_data_' . $card_info['id'],'login_time',$login_time);
             $this->createToken(['id'=>$card_info['id'],'iat'=>$login_time]);
             $this->setData($card_info);
             $this->setToken();
